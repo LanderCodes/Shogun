@@ -3,9 +3,7 @@
 
 #include "types.h"
 
-/* Returns -1 when no config file exists, otherwise a settings bitfield. */
-int config_load(void);
-void config_save(const Settings *settings);
-void settings_from_bits(Settings *settings, int bits);
+/* Starts every session with the same settings; nothing is written to disk. */
+void settings_init(Settings *settings);
 
 #endif

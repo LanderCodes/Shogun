@@ -2,7 +2,6 @@
 
 #include "ai.h"
 #include "board.h"
-#include "config.h"
 #include "layout.h"
 #include "rules.h"
 
@@ -53,15 +52,12 @@ static void activate_menu(Game *game)
         break;
     case 3:
         game->settings.show_moves = !game->settings.show_moves;
-        config_save(&game->settings);
         break;
     case 4:
         game->settings.show_terrain = !game->settings.show_terrain;
-        config_save(&game->settings);
         break;
     case 5:
         game->settings.improved_ai = !game->settings.improved_ai;
-        config_save(&game->settings);
         break;
     default: break;
     }

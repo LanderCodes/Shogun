@@ -7,9 +7,6 @@
 #include "layout.h"
 #include "rules.h"
 
-/* game.c only needs this when a setting is toggled. */
-void config_save(const Settings *settings) { (void)settings; }
-
 static int piece_count(const Game *game, Side side)
 {
     int count = 0;

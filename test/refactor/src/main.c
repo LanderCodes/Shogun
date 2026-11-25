@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     input_init(&input);
 
     Settings settings;
-    settings_from_bits(&settings, config_load());
+    settings_init(&settings);
 
     uint32_t seed = SDL_GetTicks() ^ (uint32_t)(uintptr_t)&app;
     Game game;

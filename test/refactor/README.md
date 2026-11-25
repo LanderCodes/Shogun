@@ -21,7 +21,7 @@ its own file:
 | `src/rules.c` | legal move generation, check and winner tests |
 | `src/ai.c` | computer player (classic and improved settings) |
 | `src/layout.c` | landscape/portrait geometry and hit testing |
-| `src/config.c` | settings persistence |
+| `src/config.c` | fresh session-only settings (nothing saved) |
 | `src/types.h` | shared plain structs and enums |
 | `src/assets.h` | the original embedded image tables (data only) |
 

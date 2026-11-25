@@ -16,6 +16,8 @@ static const Color NAVY_MENU = {0, 0, 64};
 static const Color NAVY_PLAY = {0, 0, 32};
 static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
+static const Color SETTING_ON = {80, 255, 80};
+static const Color SETTING_OFF = {255, 90, 90};
 static const Color OLIVE = {128, 128, 0};
 static const Color OLIVE_LIGHT = {159, 159, 63};
 static const Color TEAL = {0, 128, 128};
@@ -95,6 +97,12 @@ static Color box_highlight(Color base)
     return (Color){159, 63, 191};
 }
 
+static Color menu_text_color(int index, const Settings *settings)
+{
+    if (index == 3) return settings->show_moves ? SETTING_ON : SETTING_OFF;
+    return WHITE;
+}
+
 static void draw_menu(Art *art, const Game *game, int portrait)
 {
     int w = layout_width(portrait);
@@ -115,10 +123,13 @@ static void draw_menu(Art *art, const Game *game, int portrait)
         Color base = box_color(portrait, i);
         int active = i == game->menu_cursor;
 
+        art->alpha = active ? 0.35f : 1.0f;
         art->color = active ? GOLD : WHITE;
         art_rect(art, box.x, box.y, box.w, box.h);
+        art->alpha = active ? 0.45f : 1.0f;
         art->color = active ? box_highlight(base) : base;
         art_rect(art, box.x + 2.0f, box.y + 2.0f, box.w - 4.0f, box.h - 4.0f);
+        art->alpha = 1.0f;
         art->color = WHITE;
     }
 
@@ -128,23 +139,24 @@ static void draw_menu(Art *art, const Game *game, int portrait)
         char status[32];
         menu_status(i, &game->settings, status, sizeof(status));
         float cx = box.x + box.w / 2.0f;
+        Color text_color = menu_text_color(i, &game->settings);
 
         if (portrait) {
             if (i < 3) {
                 static const float offsets[3] = {47.0f, 47.0f, 42.0f};
                 label(art, menu_name_portrait(i), cx, box.y + offsets[i],
-                      2.0f, WHITE, 1);
+                      2.0f, text_color, 1);
             } else {
                 char line[64];
                 snprintf(line, sizeof(line), "%s %s",
                          menu_name_portrait(i), status);
-                label(art, line, cx, box.y + 27.0f, 1.0f, WHITE, 1);
+                label(art, line, cx, box.y + 27.0f, 1.0f, text_color, 1);
             }
         } else if (i < 3) {
-            label(art, menu_name(i), cx, box.y + 34.0f, 2.0f, WHITE, 1);
+            label(art, menu_name(i), cx, box.y + 34.0f, 2.0f, text_color, 1);
         } else {
-            label(art, menu_name(i), cx, box.y + 18.0f, 1.0f, WHITE, 1);
-            label(art, status, cx, box.y + 44.0f, 2.0f, WHITE, 1);
+            label(art, menu_name(i), cx, box.y + 18.0f, 1.0f, text_color, 1);
+            label(art, status, cx, box.y + 44.0f, 2.0f, text_color, 1);
         }
     }
 
@@ -226,7 +238,7 @@ static void draw_board(Art *art, const Game *game, int portrait)
             }
 
             if (is_move_target(game, row, col)) {
-                art->alpha = 0.50f;
+                art->alpha = 0.25f;
                 art->color = GOLD;
                 art_rect(art, x - 30.0f, y - 30.0f, 60.0f, 60.0f);
                 art->alpha = 1.0f;
