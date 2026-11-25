@@ -1,17 +1,19 @@
 # SHOGUN - silent Linux SDL2 builds
 
-This repository contains two Linux SDL2 builds of the same SHOGUN game. Both are
-silent: there is no audio device, no sound assets and no sound playback in either
+This repository contains three Linux SDL2 builds of the same SHOGUN game. All are
+silent: there is no audio device, no sound assets and no sound playback in any
 build.
 
-1. `test/full-c-no-sound` - the native C port generated with WABT's `wasm2c`
-   (recommended, no interpreter dependency);
-2. `test/no-sound` - the earlier wasm3 interpreter build, kept for reference.
+1. `test/refactor` - a from-scratch, plain C99 rewrite (recommended for future
+   work; no WebAssembly, no generated code);
+2. `test/full-c-no-sound` - the native C port generated with WABT's `wasm2c`
+   (no interpreter dependency);
+3. `test/no-sound` - the earlier wasm3 interpreter build, kept for reference.
 
-The game logic itself is not hand-decompiled. It is the original WebAssembly
-module, either interpreted directly or translated into portable C by `wasm2c`,
-driven by a small SDL2 host program that implements the imports the module
-expects.
+The two older builds replay the original WebAssembly module, either interpreted
+directly or translated into portable C by `wasm2c`, driven by a small SDL2 host
+program that implements the imports the module expects. The rewrite implements
+the same game directly in ordinary C and is documented in its own README.
 
 The upstream game is SHOGUN by TCKSoft / Andrew Pointon, based on the board game
 by Teruo Matsumoto. See `README.txt` for the original game rules, controls and
@@ -27,7 +29,12 @@ credits.
 ├── README.txt                 original upstream game notes
 ├── Shogun.exe                 pre-existing Windows executable (opaque binary)
 └── test/
-    ├── full-c-no-sound/       native C port, silent (recommended)
+    ├── refactor/              clean pure-C rewrite, silent (recommended)
+    │   ├── CMakeLists.txt
+    │   ├── README.md
+    │   ├── build/             generated CMake build directory
+    │   └── src/               one small module per game feature
+    ├── full-c-no-sound/       native C port, silent
     │   ├── CMakeLists.txt
     │   ├── README.txt
     │   ├── WABT-LICENSE
@@ -210,7 +217,42 @@ no sound arrays, and its host never calls `SDL_Init(SDL_INIT_AUDIO)`; the
 it ignores all `gfxtext` (`id == 5`) draw calls, and it filters the `zxfont`
 ticker glyphs (`id == 7`) in the bottom menu band, just like the native C host.
 
-It is kept for reference only; use `test/full-c-no-sound` for further work.
+It is kept for reference only; use `test/refactor` or `test/full-c-no-sound` for
+further work.
+
+---
+
+## 5b. Pure-C rewrite (`test/refactor`)
+
+This build starts from the original game's image assets and rules but replaces
+all game logic with ordinary C99. There is no generated code, no WebAssembly
+runtime, no `P_img` import layer and no hidden memory addresses. Each feature
+lives in its own source file:
+
+```text
+src/
+├── main.c      entry point and fixed-step loop
+├── app.c       SDL window, renderer, scaling, fullscreen
+├── input.c     keyboard, mouse and controller
+├── game.c      screens, selection, turns, winner
+├── menu.c      menu labels and settings text
+├── render.c    drawing for every screen
+├── art.c       texture cache, sprites, rectangles
+├── font.c      zxfont glyphs and text layout
+├── board.c     board and hidden terrain numbers
+├── rules.c     move generation, check, winner
+├── ai.c        classic and improved computer player
+├── layout.c    landscape/portrait geometry and hit testing
+├── config.c    settings file
+├── types.h     shared plain structs
+└── assets.h    embedded images only
+```
+
+The rewrite keeps the same logical resolutions (960x540 landscape, 480x800
+portrait), menu options, controls and board rules. It has no sound and never
+draws the original scrolling welcome text. See `test/refactor/README.md` for
+build instructions and the list of intentional differences from the generated
+builds.
 
 ---
 
@@ -305,7 +347,16 @@ sudo apt-get install build-essential cmake pkg-config libsdl2-dev
 A C99 compiler and `libm` are also required. WABT is only needed if you want to
 regenerate `game.c`; it is not needed to build the checked-in C port.
 
-### Native C port (recommended)
+### Pure-C rewrite (recommended)
+
+```bash
+cd /home/lander/Projects/game
+cmake -S test/refactor -B test/refactor/build
+cmake --build test/refactor/build -j2
+./test/refactor/build/shogun
+```
+
+### Native C port
 
 ```bash
 cd /home/lander/Projects/game
@@ -339,15 +390,16 @@ memory addresses listed above still apply to a different WASM build.
 
 ## 9. Known weak points
 
-1. **`game.c` is generated and huge.** It is about 14,937 lines of
-   machine-generated control flow; small logic changes should be made in the
-   original source/WASM workflow if available.
+1. **`game.c` in `test/full-c-no-sound` is generated and huge.** It is about
+   14,937 lines of machine-generated control flow; the pure-C rewrite is the
+   better place for logic changes.
 2. **Internal addresses are hard-coded in the host.** The native C host reads
    `5456` for game state and knows about `6468` for winner values. A different
    WASM build may move them. The menu ticker filter is likewise tied to the
    current logical layout.
-3. **No automated regression suite lives in the repository.** Earlier trace and
-   visual checks used temporary files outside the repo.
+3. **Only the rewrite has an automated test.** `ctest` in `test/refactor/build`
+   checks basic game logic; the older builds were checked with headless smoke
+   tests and temporary trace tools outside the repo.
 4. **Headless tests only prove "no crash and expected calls".** They do not
    compare rendered pixels; visual checks need a real or virtual display.
 5. **Settings persistence is minimal.** One signed integer is written as decimal
@@ -362,7 +414,12 @@ memory addresses listed above still apply to a different WASM build.
 ## 10. Quick reference
 
 ```bash
-# Native C port, silent (recommended)
+# Pure-C rewrite, silent (recommended)
+cmake -S test/refactor -B test/refactor/build
+cmake --build test/refactor/build -j2
+./test/refactor/build/shogun
+
+# Native C port, silent
 cmake -S test/full-c-no-sound -B test/full-c-no-sound/build
 cmake --build test/full-c-no-sound/build -j2
 SHOGUN_DEBUG=1 ./test/full-c-no-sound/build/shogun

@@ -1,0 +1,33 @@
+#ifndef SHOGUN_GAME_H
+#define SHOGUN_GAME_H
+
+#include "types.h"
+
+typedef struct {
+    Board board;
+    Settings settings;
+    Screen screen;
+    Screen back;
+    Side turn;
+    int two_player;
+    Cell cursor;
+    Cell selected;
+    int has_selection;
+    Move moves[MAX_MOVES];
+    int move_count;
+    int winner;
+    int check_timer;
+    int thinking;
+    int menu_cursor;
+    int hover_item;
+    int tick;
+} Game;
+
+void game_init(Game *game, uint32_t seed, const Settings *settings);
+void game_update(Game *game);
+void game_key(Game *game, int code);
+void game_mouse_move(Game *game, float x, float y, int portrait);
+void game_mouse_down(Game *game, float x, float y, int portrait);
+int game_hovering_button(const Game *game);
+
+#endif
