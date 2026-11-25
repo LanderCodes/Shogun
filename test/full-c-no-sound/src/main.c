@@ -287,6 +287,11 @@ void w2c_env_P_img(struct w2c_env *env, u32 id, u32 frame, f32 x, f32 y,
     if (id == 5u && frame == 2u) {
         return;
     }
+    /* The menu ticker is drawn with zxfont glyphs in a narrow band just above
+       the bottom bar; the game's other text rows are well clear of it. */
+    if (id == 7u && y > (f32)app.lh - 42.0f && y < (f32)app.lh - 30.0f) {
+        return;
+    }
     draw_frame((int32_t)id, frame, x, y, rot, sx, sy);
 }
 

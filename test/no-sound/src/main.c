@@ -293,6 +293,11 @@ m3ApiRawFunction(host_img)
     if (id == 5) {
         m3ApiSuccess();
     }
+    /* Skip the scrolling menu ticker drawn with zxfont glyphs in the narrow
+       band just above the bottom bar; other text rows are well clear of it. */
+    if (id == 7 && y > (float)app.lh - 42.0f && y < (float)app.lh - 30.0f) {
+        m3ApiSuccess();
+    }
     if (id < 0 || id >= MAX_IMAGES || id >= (int)g_image_count) {
         m3ApiSuccess();
     }

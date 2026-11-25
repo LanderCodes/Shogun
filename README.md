@@ -145,9 +145,14 @@ This is the recommended build. `src/assets.h` contains only the image tables;
 all sound arrays are gone. `src/main.c` does not initialize SDL audio, does not
 open an audio device, and `w2c_env_P_sound()` is an empty stub.
 
-`w2c_env_P_img()` also suppresses the original `gfxtext` frame 2 draw call, which
-is how the module requests the scrolling welcome message. Nothing is drawn in
-its place. The legacy host similarly no longer draws its own credit line.
+`w2c_env_P_img()` suppresses the `gfxtext` frame 2 draw call, and it also filters
+the game's bottom menu ticker. That ticker is not a `gfxtext` frame: the module
+draws it character by character with `zxfont` glyphs (`id == 7`) in a narrow band
+just above the bottom bar (`y` around 38-40 pixels above the logical height).
+The host drops those specific glyph draws and draws nothing in their place.
+Other text rows, including the pause/menu hint and the help screen, are outside
+that band and remain untouched. The legacy host applies the same filter and no
+longer draws its own credit line.
 
 The host also skips the bottom 8-pixel bar drawn by the game, matching the
 earlier experimental no-sound behavior.
@@ -199,9 +204,9 @@ so it cannot hide the winner banner (state `4`).
 This build keeps the original WebAssembly module in `src/assets.h` and runs it
 through the vendored wasm3 interpreter. Its `assets.h` has the image tables but
 no sound arrays, and its host never calls `SDL_Init(SDL_INIT_AUDIO)`; the
-`P_sound` import is an empty stub. Its host-drawn bottom credit line was removed
-and it ignores all `gfxtext` (`id == 5`) draw calls, including the original
-scrolling message.
+`P_sound` import is an empty stub. Its host-drawn bottom credit line was removed,
+it ignores all `gfxtext` (`id == 5`) draw calls, and it filters the `zxfont`
+ticker glyphs (`id == 7`) in the bottom menu band, just like the native C host.
 
 It is kept for reference only; use `test/full-c-no-sound` for further work.
 
@@ -337,7 +342,8 @@ memory addresses listed above still apply to a different WASM build.
    original source/WASM workflow if available.
 2. **Internal addresses are hard-coded in the host.** The native C host reads
    `5456` for game state and knows about `6468` for winner values. A different
-   WASM build may move them.
+   WASM build may move them. The menu ticker filter is likewise tied to the
+   current logical layout.
 3. **No automated regression suite lives in the repository.** Earlier trace and
    visual checks used temporary files outside the repo.
 4. **Headless tests only prove "no crash and expected calls".** They do not
