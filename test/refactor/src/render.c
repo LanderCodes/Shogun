@@ -13,7 +13,9 @@
 /* Colours copied from the original game's P_color calls. */
 static const Color WHITE = {255, 255, 255};
 static const Color BLACK = {0, 0, 0};
-static const Color BACKDROP = {12, 12, 12};
+static const Color BACKDROP = {16, 16, 16};
+static const Color TILE_LIGHT = {72, 72, 72};
+static const Color TILE_DARK = {24, 24, 24};
 static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
 static const Color SETTING_BOX_ON = {0, 95, 0};
@@ -46,19 +48,27 @@ static void label(Art *art, const char *text, float x, float y,
     art->color = WHITE;
 }
 
-/* The original build uses a checkerboard of 60px tiles behind its screens. */
+/* The original build uses a checkerboard of 60px tiles behind its screens.
+   The sprite art is dark, so a neutral square keeps the pattern visible. */
 static void draw_tiles(Art *art, int portrait)
 {
     int w = layout_width(portrait);
     int h = layout_height(portrait);
-    art->color = WHITE;
     for (int row = 0; row * 60 < h; ++row) {
         for (int col = 0; col * 60 < w; ++col) {
-            art_image(art, 1, (row + col) & 1,
-                      (float)col * 60.0f + 30.0f,
+            int dark = (row + col) & 1;
+            art->alpha = 1.0f;
+            art->color = dark ? TILE_DARK : TILE_LIGHT;
+            art_rect(art, (float)col * 60.0f, (float)row * 60.0f,
+                     60.0f, 60.0f);
+            art->alpha = 0.35f;
+            art->color = WHITE;
+            art_image(art, 1, dark, (float)col * 60.0f + 30.0f,
                       (float)row * 60.0f + 30.0f, 1.0f, 1.0f);
         }
     }
+    art->alpha = 1.0f;
+    art->color = WHITE;
 }
 
 static void draw_logo(Art *art, int portrait)
@@ -128,15 +138,8 @@ static Color menu_text_color(int index, const Settings *settings)
 
 static void draw_menu(Art *art, const Game *game, int portrait)
 {
-    int w = layout_width(portrait);
-    int h = layout_height(portrait);
-
     art_clear(art, BACKDROP);
     draw_tiles(art, portrait);
-    art->alpha = 0.45f;
-    art->color = BLACK;
-    art_rect(art, 0.0f, 0.0f, (float)w, (float)h);
-    art->alpha = 1.0f;
     draw_logo(art, portrait);
 
     /* The original paints every box before it paints any text. */
@@ -225,16 +228,8 @@ static void draw_board(Art *art, const Game *game, int portrait)
 {
     art_clear(art, BACKDROP);
 
-    /* The no-sound build's menu tiles are reused here as a dimmed backdrop.
-       A neutral veil keeps the checker pattern visible without any blue tint. */
-    int w = layout_width(portrait);
-    int h = layout_height(portrait);
+    /* The checkerboard is deliberately visible here, not veiled in blue. */
     draw_tiles(art, portrait);
-    art->alpha = 0.45f;
-    art->color = BLACK;
-    art_rect(art, 0.0f, 0.0f, (float)w, (float)h);
-    art->alpha = 1.0f;
-    art->color = WHITE;
 
     if (!portrait) {
         art->color = BOARD_FRAME;
@@ -543,6 +538,32 @@ static void draw_help(Art *art, const Game *game, int portrait)
     }
 }
 
+static void draw_winner_menu(Art *art, const Game *game, int portrait)
+{
+    for (int i = 0; i < 2; ++i) {
+        Rect outer;
+        Rect inner;
+        layout_winner_button(portrait, i, &outer, &inner);
+        int active = game->winner_cursor == i || game->hover_item == i;
+        Color edge = active ? GOLD : WHITE;
+        Color fill = i == 0 ? GREEN_BUTTON : MAROON;
+
+        art->alpha = 1.0f;
+        art->color = edge;
+        art_rect(art, outer.x, outer.y, outer.w, outer.h);
+        art->color = fill;
+        art_rect(art, inner.x, inner.y, inner.w, inner.h);
+
+        label(art, i == 0 ? "PLAY AGAIN" : "MAIN MENU",
+              inner.x + inner.w / 2.0f, inner.y + 14.0f,
+              1.5f, WHITE, 1);
+    }
+
+    label(art, "ENTER: SELECT    UP/DOWN: CHOOSE",
+          portrait ? 240.0f : 735.0f,
+          portrait ? 766.0f : 422.0f, 1.0f, HINT, 1);
+}
+
 /* The original banner drifts right and back by a few pixels. */
 static float winner_banner_drift(const Game *game)
 {
@@ -552,18 +573,19 @@ static float winner_banner_drift(const Game *game)
 
 static void draw_winner(Art *art, const Game *game, int portrait)
 {
-    /* This is the whole winner animation from the no-sound build: the
-       finished board, orange move brackets, grey captured pieces and a
-       slowly drifting banner. No extra logo or impact text is added. */
+    /* Keep the no-sound winner board, brackets and drifting banner, then add
+       the wordless logo impact and a small rematch menu. */
     draw_board(art, game, portrait);
     effects_draw_check(art, game, portrait);
     draw_status(art, game, portrait);
+    effects_draw_win(art, game, portrait);
 
     float drift = winner_banner_drift(game);
     art->color = WHITE;
     art_image(art, 5, game->winner == SIDE_WHITE ? 4 : 3,
               (portrait ? 240.0f : 758.0f) + (portrait ? drift * 0.5f : drift),
               portrait ? 430.0f : 230.0f, 0.9f, 0.9f);
+    draw_winner_menu(art, game, portrait);
 }
 
 void render_screen(Art *art, const Game *game, int portrait, uint32_t now)

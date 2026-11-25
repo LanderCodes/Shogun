@@ -110,3 +110,36 @@ void layout_pause_button(int portrait, int index, Rect *outer, Rect *inner)
         *inner = (Rect){90.0f, 296.0f, 360.0f, 50.0f};
     }
 }
+
+void layout_winner_button(int portrait, int index, Rect *outer, Rect *inner)
+{
+    if (index == 0) {
+        if (portrait) {
+            *outer = (Rect){38.0f, 632.0f, 404.0f, 58.0f};
+            *inner = (Rect){40.0f, 634.0f, 400.0f, 54.0f};
+        } else {
+            *outer = (Rect){558.0f, 300.0f, 354.0f, 50.0f};
+            *inner = (Rect){560.0f, 302.0f, 350.0f, 46.0f};
+        }
+    } else {
+        if (portrait) {
+            *outer = (Rect){38.0f, 700.0f, 404.0f, 58.0f};
+            *inner = (Rect){40.0f, 702.0f, 400.0f, 54.0f};
+        } else {
+            *outer = (Rect){558.0f, 360.0f, 354.0f, 50.0f};
+            *inner = (Rect){560.0f, 362.0f, 350.0f, 46.0f};
+        }
+    }
+}
+
+int layout_winner_button_at(int portrait, float x, float y)
+{
+    Rect outer;
+    Rect inner;
+    for (int i = 0; i < 2; ++i) {
+        layout_winner_button(portrait, i, &outer, &inner);
+        if (x >= outer.x && x <= outer.x + outer.w &&
+            y >= outer.y && y <= outer.y + outer.h) return i;
+    }
+    return -1;
+}

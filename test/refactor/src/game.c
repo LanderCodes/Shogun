@@ -41,6 +41,14 @@ static void start_game(Game *game, int two_player)
     game->thinking = !two_player && game->turn == SIDE_RED ? 12 : 0;
 }
 
+static void restart_game(Game *game)
+{
+    /* Each rematch gets a fresh terrain shuffle without changing settings. */
+    game->seed = game->seed * 1664525u + 1013904223u;
+    board_init(&game->board, game->seed);
+    start_game(game, game->two_player);
+}
+
 static void activate_menu(Game *game)
 {
     switch (game->menu_cursor) {
@@ -77,6 +85,7 @@ static void finish_move(Game *game, const Move *move)
     game->winner = rules_winner(&game->board);
     if (game->winner >= 0) {
         game->win_timer = 0;
+        game->winner_cursor = 0;
         game->screen = SCREEN_WINNER;
         return;
     }
@@ -143,7 +152,8 @@ static void move_cursor(Game *game, int code)
 void game_init(Game *game, uint32_t seed, const Settings *settings)
 {
     memset(game, 0, sizeof(*game));
-    board_init(&game->board, seed);
+    game->seed = seed;
+    board_init(&game->board, game->seed);
     game->settings = *settings;
     game->screen = SCREEN_MENU;
     game->back = SCREEN_MENU;
@@ -215,15 +225,26 @@ void game_key(Game *game, int code)
         }
         break;
     case SCREEN_WINNER:
-        game->screen = SCREEN_MENU;
+        if (code == 1 || code == 3) game->winner_cursor = 0;
+        else if (code == 2 || code == 4) game->winner_cursor = 1;
+        else if (code == 5) {
+            if (game->winner_cursor == 0) restart_game(game);
+            else game->screen = SCREEN_MENU;
+        } else if (code == 6) {
+            game->screen = SCREEN_MENU;
+        }
         break;
     }
 }
 
 void game_mouse_move(Game *game, float x, float y, int portrait)
 {
-    game->hover_item = game->screen == SCREEN_MENU
-                           ? layout_menu_item_at(portrait, x, y) : -1;
+    game->hover_item = -1;
+    if (game->screen == SCREEN_MENU) {
+        game->hover_item = layout_menu_item_at(portrait, x, y);
+    } else if (game->screen == SCREEN_WINNER) {
+        game->hover_item = layout_winner_button_at(portrait, x, y);
+    }
 
     int row;
     int col;
@@ -295,8 +316,11 @@ void game_mouse_down(Game *game, float x, float y, int portrait)
         ++game->help_page;
         if (game->help_page > 2) game->screen = game->back;
         break;
-    case SCREEN_WINNER:
-        game->screen = SCREEN_MENU;
+    case SCREEN_WINNER: {
+        int button = layout_winner_button_at(portrait, x, y);
+        if (button == 0) restart_game(game);
+        else if (button == 1) game->screen = SCREEN_MENU;
         break;
+    }
     }
 }

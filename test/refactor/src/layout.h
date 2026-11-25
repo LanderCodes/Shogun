@@ -22,4 +22,8 @@ int layout_menu_item_at(int portrait, float x, float y);
 void layout_pause_control(int portrait, Rect *out);
 void layout_pause_button(int portrait, int index, Rect *outer, Rect *inner);
 
+/* Winner menu buttons: 0 = PLAY AGAIN, 1 = MAIN MENU. */
+void layout_winner_button(int portrait, int index, Rect *outer, Rect *inner);
+int layout_winner_button_at(int portrait, float x, float y);
+
 #endif

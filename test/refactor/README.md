@@ -22,7 +22,7 @@ its own file:
 | `src/ai.c` | computer player (steady classic, deep-search improved) |
 | `src/layout.c` | landscape/portrait geometry and hit testing |
 | `src/config.c` | fresh session-only settings (nothing saved) |
-| `src/effects.c` | check shogun badge |
+| `src/effects.c` | check shogun badge and wordless winner logo impact |
 | `src/types.h` | shared plain structs and enums |
 | `src/assets.h` | the original embedded image tables (data only) |
 

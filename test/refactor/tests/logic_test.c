@@ -108,6 +108,24 @@ int main(void)
         assert(move.to.row == 6 && move.to.col == 3);
     }
 
+    /* The winner menu can start a fresh game without closing the app. */
+    Game finished;
+    game_init(&finished, 777u, &settings);
+    finished.two_player = 1;
+    finished.screen = SCREEN_WINNER;
+    finished.winner = SIDE_WHITE;
+    game_mouse_down(&finished, 735.0f, 325.0f, 0);  /* PLAY AGAIN */
+    assert(finished.screen == SCREEN_PLAY);
+    assert(finished.winner == -1);
+    assert(piece_count(&finished, SIDE_WHITE) == 8);
+    assert(piece_count(&finished, SIDE_RED) == 8);
+
+    finished.screen = SCREEN_WINNER;
+    finished.winner = SIDE_RED;
+    finished.winner_cursor = 1;
+    game_key(&finished, 5);                         /* MAIN MENU */
+    assert(finished.screen == SCREEN_MENU);
+
     puts("logic test: ok");
     return 0;
 }

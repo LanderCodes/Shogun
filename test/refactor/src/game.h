@@ -5,6 +5,7 @@
 
 typedef struct {
     Board board;
+    uint32_t seed;
     Settings settings;
     Screen screen;
     Screen back;
@@ -24,6 +25,7 @@ typedef struct {
     int has_guide;
     int thinking;
     int menu_cursor;
+    int winner_cursor;
     int help_page;
     int hover_item;
     Cell hover_cell;
