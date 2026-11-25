@@ -512,16 +512,26 @@ static void draw_help(Art *art, const Game *game, int portrait)
     }
 }
 
+/* The original banner drifts right and back by a few pixels. */
+static float winner_banner_drift(const Game *game)
+{
+    int phase = game->win_timer % 80;
+    return (float)(phase < 40 ? phase : 80 - phase) / 5.0f;
+}
+
 static void draw_winner(Art *art, const Game *game, int portrait)
 {
-    /* The original keeps the finished board visible and stamps a ready-made
-       gfxtext banner over it. */
+    /* The original no-sound build keeps the finished board, orange move
+       brackets and grey captured pieces visible behind the banner. */
     draw_board(art, game, portrait);
+    effects_draw_check(art, game, portrait);
     draw_status(art, game, portrait);
     effects_draw_win(art, game, portrait);
+
+    float drift = winner_banner_drift(game);
     art->color = WHITE;
     art_image(art, 5, game->winner == SIDE_WHITE ? 4 : 3,
-              portrait ? 240.0f : 758.0f,
+              (portrait ? 240.0f : 758.0f) + (portrait ? drift * 0.5f : drift),
               portrait ? 430.0f : 230.0f, 0.9f, 0.9f);
 }
 

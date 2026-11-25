@@ -7,7 +7,8 @@
 /* Small shogun badge shown while a check warning is active. */
 void effects_draw_check(Art *art, const Game *game, int portrait);
 
-/* Large animated shogun and logo impact shown on the winner screen. */
+/* Original-style winner screen: drifting banner is in render.c, while this
+   draws the spin-in shogun, targeting brackets and small logo impact. */
 void effects_draw_win(Art *art, const Game *game, int portrait);
 
 #endif
