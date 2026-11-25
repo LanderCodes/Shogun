@@ -18,6 +18,7 @@ static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
 static const Color SETTING_ON = {80, 255, 80};
 static const Color SETTING_OFF = {255, 90, 90};
+static const Color HOVER = {80, 255, 80};
 static const Color OLIVE = {128, 128, 0};
 static const Color OLIVE_LIGHT = {159, 159, 63};
 static const Color TEAL = {0, 128, 128};
@@ -123,10 +124,10 @@ static void draw_menu(Art *art, const Game *game, int portrait)
         Color base = box_color(portrait, i);
         int active = i == game->menu_cursor;
 
-        art->alpha = active ? 0.35f : 1.0f;
+        art->alpha = active ? 0.70f : 1.0f;
         art->color = active ? GOLD : WHITE;
         art_rect(art, box.x, box.y, box.w, box.h);
-        art->alpha = active ? 0.45f : 1.0f;
+        art->alpha = active ? 0.80f : 1.0f;
         art->color = active ? box_highlight(base) : base;
         art_rect(art, box.x + 2.0f, box.y + 2.0f, box.w - 4.0f, box.h - 4.0f);
         art->alpha = 1.0f;
@@ -229,8 +230,7 @@ static void draw_board(Art *art, const Game *game, int portrait)
                     art_image_rot(art, 4, piece->value - 1, x, y,
                                   rot, 1.0f, 1.0f);
                 }
-            } else if (game->settings.show_terrain ||
-                       game->board.terrain[row][col].revealed) {
+            } else if (game->settings.show_terrain) {
                 int value = game->board.terrain[row][col].value;
                 art_image_rot(art, 4, value - 1, x,
                               y + (row < 4 ? -10.0f : 10.0f),
@@ -238,7 +238,7 @@ static void draw_board(Art *art, const Game *game, int portrait)
             }
 
             if (is_move_target(game, row, col)) {
-                art->alpha = 0.25f;
+                art->alpha = 0.40f;
                 art->color = GOLD;
                 art_rect(art, x - 30.0f, y - 30.0f, 60.0f, 60.0f);
                 art->alpha = 1.0f;
@@ -264,6 +264,23 @@ static void draw_board(Art *art, const Game *game, int portrait)
         art->alpha = 0.50f;
         art->color = CHECK;
         art_rect(art, x - 30.0f, y - 30.0f, 60.0f, 60.0f);
+        art->alpha = 1.0f;
+        art->color = WHITE;
+    }
+
+    if (game->has_hover) {
+        float x;
+        float y;
+        layout_cell_center(portrait, game->hover_cell.row,
+                           game->hover_cell.col, &x, &y);
+        x -= 30.0f;
+        y -= 30.0f;
+        art->alpha = 0.45f;
+        art->color = HOVER;
+        art_rect(art, x + 2.0f, y + 2.0f, 56.0f, 2.0f);
+        art_rect(art, x + 2.0f, y + 56.0f, 56.0f, 2.0f);
+        art_rect(art, x + 2.0f, y + 2.0f, 2.0f, 56.0f);
+        art_rect(art, x + 56.0f, y + 2.0f, 2.0f, 56.0f);
         art->alpha = 1.0f;
         art->color = WHITE;
     }

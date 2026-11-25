@@ -25,6 +25,8 @@ typedef struct {
     int menu_cursor;
     int help_page;
     int hover_item;
+    Cell hover_cell;
+    int has_hover;
     int tick;
 } Game;
 

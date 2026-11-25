@@ -22,7 +22,6 @@ typedef struct {
 
 typedef struct {
     uint8_t value;          /* hidden terrain number, 1..4 */
-    uint8_t revealed;       /* painted once the square is left */
 } Terrain;
 
 typedef struct {

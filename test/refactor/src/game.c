@@ -221,6 +221,12 @@ void game_mouse_move(Game *game, float x, float y, int portrait)
 {
     game->hover_item = game->screen == SCREEN_MENU
                            ? layout_menu_item_at(portrait, x, y) : -1;
+
+    int row;
+    int col;
+    game->has_hover = game->screen == SCREEN_PLAY &&
+                      layout_cell_at(portrait, x, y, &row, &col);
+    if (game->has_hover) game->hover_cell = (Cell){row, col};
 }
 
 int game_hovering_button(const Game *game)

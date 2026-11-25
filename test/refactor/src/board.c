@@ -32,7 +32,6 @@ void board_init(Board *board, uint32_t seed)
             board->piece[row][col].side = SIDE_WHITE;
             board->piece[row][col].value = 0;
             board->terrain[row][col].value = 0;
-            board->terrain[row][col].revealed = 0;
         }
     }
 
@@ -138,7 +137,6 @@ void board_vacate(Board *board, int row, int col)
 {
     board->piece[row][col].type = PIECE_NONE;
     board->piece[row][col].value = 0;
-    board->terrain[row][col].revealed = 1;
 }
 
 void board_apply(Board *board, const Move *move)
@@ -147,5 +145,4 @@ void board_apply(Board *board, const Move *move)
     board_vacate(board, move->from.row, move->from.col);
     moving.value = board_value(board, move->to.row, move->to.col);
     board->piece[move->to.row][move->to.col] = moving;
-    board->terrain[move->to.row][move->to.col].revealed = 1;
 }
