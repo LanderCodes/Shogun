@@ -105,6 +105,12 @@ void art_rect(Art *art, float x, float y, float w, float h)
 
 void art_image(Art *art, int id, int frame, float x, float y, float sx, float sy)
 {
+    art_image_rot(art, id, frame, x, y, 0.0f, sx, sy);
+}
+
+void art_image_rot(Art *art, int id, int frame, float x, float y,
+                   float rot, float sx, float sy)
+{
     SDL_Texture *tex = tinted_texture(art, id);
     if (!tex) return;
 
@@ -122,5 +128,5 @@ void art_image(Art *art, int id, int frame, float x, float y, float sx, float sy
                      (float)image->frame_w * sx,
                      (float)image->frame_h * sy};
     SDL_SetTextureAlphaMod(tex, (uint8_t)(art->alpha * 255.0f));
-    SDL_RenderCopyExF(art->renderer, tex, &src, &dst, 0.0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(art->renderer, tex, &src, &dst, rot, NULL, SDL_FLIP_NONE);
 }

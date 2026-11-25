@@ -17,8 +17,13 @@ typedef struct {
     int move_count;
     int winner;
     int check_timer;
+    Cell check_cell;
+    Cell guide_from;
+    Cell guide_to;
+    int has_guide;
     int thinking;
     int menu_cursor;
+    int help_page;
     int hover_item;
     int tick;
 } Game;

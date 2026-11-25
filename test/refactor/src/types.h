@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
     Piece piece[BOARD_SIZE][BOARD_SIZE];
     Terrain terrain[BOARD_SIZE][BOARD_SIZE];
+    uint32_t rng_state;             /* next value after the terrain shuffle */
 } Board;
 
 typedef struct {
@@ -53,7 +54,6 @@ typedef enum {
     SCREEN_PLAY,
     SCREEN_PAUSE,
     SCREEN_HELP,
-    SCREEN_ABOUT,
     SCREEN_WINNER
 } Screen;
 

@@ -8,17 +8,37 @@
 
 #include <string.h>
 
+static void set_check(Game *game, const Cell *moved_to)
+{
+    if (!moved_to) {
+        game->check_timer = 0;
+        game->check_cell.row = 0;
+        game->check_cell.col = 0;
+        return;
+    }
+
+    game->check_timer = rules_in_check(&game->board, game->turn) ? 80 : 0;
+    game->check_cell = game->check_timer > 0 ? *moved_to : (Cell){0, 0};
+}
+
 static void start_game(Game *game, int two_player)
 {
     game->two_player = two_player;
     game->screen = SCREEN_PLAY;
-    game->turn = SIDE_WHITE;
-    game->cursor.row = 6;
+    game->turn = board_starting_side(&game->board);
+    game->cursor.row = BOARD_SIZE - 1;
     game->cursor.col = 0;
     game->has_selection = 0;
     game->winner = -1;
     game->check_timer = 0;
-    game->thinking = 0;
+    game->check_cell.row = 0;
+    game->check_cell.col = 0;
+    game->guide_from.row = -1;
+    game->guide_from.col = -1;
+    game->guide_to.row = -1;
+    game->guide_to.col = -1;
+    game->has_guide = 0;
+    game->thinking = !two_player && game->turn == SIDE_RED ? 12 : 0;
 }
 
 static void activate_menu(Game *game)
@@ -28,6 +48,7 @@ static void activate_menu(Game *game)
     case 1: start_game(game, 1); break;
     case 2:
         game->back = SCREEN_MENU;
+        game->help_page = 0;
         game->screen = SCREEN_HELP;
         break;
     case 3:
@@ -52,6 +73,9 @@ static void finish_move(Game *game, const Move *move)
     game->has_selection = 0;
     game->move_count = 0;
     game->cursor = move->to;
+    game->guide_from = move->from;
+    game->guide_to = move->to;
+    game->has_guide = 1;
 
     game->winner = rules_winner(&game->board);
     if (game->winner >= 0) {
@@ -60,7 +84,7 @@ static void finish_move(Game *game, const Move *move)
     }
 
     game->turn = other_side(game->turn);
-    game->check_timer = rules_in_check(&game->board, game->turn) ? 60 : 0;
+    set_check(game, &move->to);
 
     if (!game->two_player && game->turn == SIDE_RED) game->thinking = 12;
 }
@@ -123,11 +147,18 @@ void game_init(Game *game, uint32_t seed, const Settings *settings)
     memset(game, 0, sizeof(*game));
     board_init(&game->board, seed);
     game->settings = *settings;
-    game->screen = SCREEN_TITLE;
+    game->screen = SCREEN_MENU;
     game->back = SCREEN_MENU;
     game->winner = -1;
-    game->cursor.row = 6;
+    game->cursor.row = BOARD_SIZE - 1;
     game->cursor.col = 0;
+    game->check_cell.row = 0;
+    game->check_cell.col = 0;
+    game->guide_from.row = -1;
+    game->guide_from.col = -1;
+    game->guide_to.row = -1;
+    game->guide_to.col = -1;
+    game->has_guide = 0;
 }
 
 void game_update(Game *game)
@@ -140,7 +171,7 @@ void game_update(Game *game)
         if (move.to.row == move.from.row && move.to.col == move.from.col) {
             /* No legal move: the turn passes. */
             game->turn = other_side(game->turn);
-            game->check_timer = rules_in_check(&game->board, game->turn) ? 60 : 0;
+            set_check(game, NULL);
         } else {
             finish_move(game, &move);
         }
@@ -166,8 +197,6 @@ void game_key(Game *game, int code)
             game->menu_cursor = row * 2 + col;
         } else if (code == 5) {
             activate_menu(game);
-        } else {
-            game->screen = SCREEN_TITLE;
         }
         break;
     case SCREEN_PLAY:
@@ -180,9 +209,12 @@ void game_key(Game *game, int code)
         else if (code == 5) game->screen = SCREEN_PLAY;
         break;
     case SCREEN_HELP:
-        game->screen = code == 5 ? SCREEN_ABOUT : game->back;
+        if (code == 6) game->screen = game->back;
+        else if (code == 5) {
+            ++game->help_page;
+            if (game->help_page > 2) game->screen = game->back;
+        }
         break;
-    case SCREEN_ABOUT:
     case SCREEN_WINNER:
         game->screen = SCREEN_MENU;
         break;
@@ -214,6 +246,13 @@ void game_mouse_down(Game *game, float x, float y, int portrait)
         }
         break;
     case SCREEN_PLAY: {
+        Rect control;
+        layout_pause_control(portrait, &control);
+        if (x >= control.x && x <= control.x + control.w &&
+            y >= control.y && y <= control.y + control.h) {
+            game->screen = SCREEN_PAUSE;
+            break;
+        }
         int row;
         int col;
         if (layout_cell_at(portrait, x, y, &row, &col)) {
@@ -221,13 +260,36 @@ void game_mouse_down(Game *game, float x, float y, int portrait)
         }
         break;
     }
-    case SCREEN_PAUSE:
-        game->screen = SCREEN_PLAY;
+    case SCREEN_PAUSE: {
+        if (portrait) {
+            Rect control;
+            layout_pause_control(portrait, &control);
+            if (x >= control.x && x <= control.x + control.w &&
+                y >= control.y && y <= control.y + control.h) {
+                game->screen = SCREEN_PLAY;
+            }
+            break;
+        }
+        /* Landscape uses the CONTINUE and MAIN MENU overlay buttons. */
+        Rect outer;
+        Rect inner;
+        layout_pause_button(portrait, 0, &outer, &inner);
+        if (x >= outer.x && x <= outer.x + outer.w &&
+            y >= outer.y && y <= outer.y + outer.h) {
+            game->screen = SCREEN_PLAY;
+        } else {
+            layout_pause_button(portrait, 1, &outer, &inner);
+            if (x >= outer.x && x <= outer.x + outer.w &&
+                y >= outer.y && y <= outer.y + outer.h) {
+                game->screen = SCREEN_MENU;
+            }
+        }
         break;
+    }
     case SCREEN_HELP:
-        game->screen = SCREEN_ABOUT;
+        ++game->help_page;
+        if (game->help_page > 2) game->screen = game->back;
         break;
-    case SCREEN_ABOUT:
     case SCREEN_WINNER:
         game->screen = SCREEN_MENU;
         break;
