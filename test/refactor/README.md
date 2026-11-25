@@ -14,7 +14,7 @@ its own file:
 | `src/input.c` | keyboard, mouse and controller translation |
 | `src/game.c` | screen state machine, selection, turns, win detection |
 | `src/menu.c` | menu item names and settings status text |
-| `src/render.c` | draws every screen with the image atlases |
+| `src/render.c` | draws every screen, checkerboard backdrop and turn indicator |
 | `src/art.c` | SDL texture cache, tinted sprites, rectangles and clears |
 | `src/font.c` | zxfont glyph mapping and text layout |
 | `src/board.c` | new board, hidden terrain numbers and piece values |

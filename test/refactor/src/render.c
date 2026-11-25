@@ -15,6 +15,7 @@ static const Color WHITE = {255, 255, 255};
 static const Color BLACK = {0, 0, 0};
 static const Color NAVY_MENU = {0, 0, 64};
 static const Color NAVY_PLAY = {0, 0, 32};
+static const Color PLAY_VEIL = {0, 0, 24};
 static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
 static const Color SETTING_BOX_ON = {0, 95, 0};
@@ -47,7 +48,7 @@ static void label(Art *art, const char *text, float x, float y,
     art->color = WHITE;
 }
 
-/* The menu and title screens use a checkerboard of 60px tiles. */
+/* The original build uses a checkerboard of 60px tiles behind its screens. */
 static void draw_tiles(Art *art, int portrait)
 {
     int w = layout_width(portrait);
@@ -225,6 +226,18 @@ static void draw_guide(Art *art, int portrait, int row, int col)
 static void draw_board(Art *art, const Game *game, int portrait)
 {
     art_clear(art, NAVY_PLAY);
+
+    /* The no-sound build's menu tiles are reused here as a dimmed backdrop,
+       so the finished board still sits on the familiar checker pattern. */
+    int w = layout_width(portrait);
+    int h = layout_height(portrait);
+    draw_tiles(art, portrait);
+    art->alpha = 0.62f;
+    art->color = PLAY_VEIL;
+    art_rect(art, 0.0f, 0.0f, (float)w, (float)h);
+    art->alpha = 1.0f;
+    art->color = WHITE;
+
     if (!portrait) {
         art->color = BOARD_FRAME;
         art_rect(art, 27.0f, 27.0f, 486.0f, 486.0f);
@@ -336,6 +349,24 @@ static void status_label(Art *art, const char *text, float y, Color color)
     label(art, text, 735.0f, y, 1.0f, color, 1);
 }
 
+static void draw_turn_indicator(Art *art, const Game *game, int portrait)
+{
+    const char *text = game->turn == SIDE_RED ? "RED TO MOVE" : "WHITE TO MOVE";
+    Color color = game->turn == SIDE_RED ? RED_TEXT : PALE_TEXT;
+    float cx = portrait ? 240.0f : 735.0f;
+    float cy = portrait ? 122.0f : 152.0f;
+    float w = portrait ? 250.0f : 300.0f;
+    float h = 36.0f;
+
+    art->alpha = 0.85f;
+    art->color = BLACK;
+    art_rect(art, cx - w / 2.0f, cy - h / 2.0f, w, h);
+    art->alpha = 1.0f;
+    art->color = color;
+    art_rect(art, cx - w / 2.0f, cy - h / 2.0f, 4.0f, h);
+    label(art, text, cx, cy - 8.0f, 1.0f, color, 1);
+}
+
 static void draw_captured(Art *art, int image, int pawns, int shogun, float y)
 {
     float x = 735.0f - (float)(pawns + (shogun ? 1 : 0) - 1) * 20.0f;
@@ -362,6 +393,8 @@ static void draw_status(Art *art, const Game *game, int portrait)
     }
 
     if (game->screen == SCREEN_WINNER) return;
+
+    draw_turn_indicator(art, game, portrait);
 
     if (game->thinking) {
         art->color = WHITE;
