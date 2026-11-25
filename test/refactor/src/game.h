@@ -18,6 +18,7 @@ typedef struct {
     int winner;
     int check_timer;
     Cell check_cell;
+    int win_timer;
     Cell guide_from;
     Cell guide_to;
     int has_guide;

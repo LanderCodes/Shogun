@@ -17,12 +17,10 @@ static const Color NAVY_MENU = {0, 0, 64};
 static const Color NAVY_PLAY = {0, 0, 32};
 static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
-static const Color SETTING_ON = {80, 255, 80};
-static const Color SETTING_OFF = {255, 90, 90};
-static const Color SETTING_BOX_ON = {0, 100, 0};
-static const Color SETTING_BOX_ON_LIGHT = {0, 170, 0};
-static const Color SETTING_BOX_OFF = {120, 0, 0};
-static const Color SETTING_BOX_OFF_LIGHT = {190, 0, 0};
+static const Color SETTING_BOX_ON = {0, 95, 0};
+static const Color SETTING_BOX_ON_LIGHT = {0, 155, 0};
+static const Color SETTING_BOX_OFF = {115, 0, 0};
+static const Color SETTING_BOX_OFF_LIGHT = {185, 0, 0};
 static const Color HOVER = {80, 255, 80};
 static const Color OLIVE = {128, 128, 0};
 static const Color OLIVE_LIGHT = {159, 159, 63};
@@ -106,8 +104,9 @@ static Color box_highlight(Color base)
 static void menu_box_colors(int portrait, int index, const Settings *settings,
                             Color *base, Color *highlight)
 {
-    if (index == 3) {
-        if (settings->show_moves) {
+    if (index == 3 || index == 4) {
+        int on = index == 3 ? settings->show_moves : settings->show_terrain;
+        if (on) {
             *base = SETTING_BOX_ON;
             *highlight = SETTING_BOX_ON_LIGHT;
         } else {
@@ -120,9 +119,11 @@ static void menu_box_colors(int portrait, int index, const Settings *settings,
     *highlight = box_highlight(*base);
 }
 
+/* The setting boxes carry the red/green state, so labels stay high-contrast. */
 static Color menu_text_color(int index, const Settings *settings)
 {
-    if (index == 3) return settings->show_moves ? SETTING_ON : SETTING_OFF;
+    (void)index;
+    (void)settings;
     return WHITE;
 }
 
@@ -519,7 +520,8 @@ static void draw_winner(Art *art, const Game *game, int portrait)
     draw_status(art, game, portrait);
     effects_draw_win(art, game, portrait);
     art->color = WHITE;
-    art_image(art, 5, 4, portrait ? 240.0f : 758.0f,
+    art_image(art, 5, game->winner == SIDE_WHITE ? 4 : 3,
+              portrait ? 240.0f : 758.0f,
               portrait ? 430.0f : 230.0f, 0.9f, 0.9f);
 }
 

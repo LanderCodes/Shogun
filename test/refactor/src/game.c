@@ -30,6 +30,7 @@ static void start_game(Game *game, int two_player)
     game->has_selection = 0;
     game->winner = -1;
     game->check_timer = 0;
+    game->win_timer = 0;
     game->check_cell.row = 0;
     game->check_cell.col = 0;
     game->guide_from.row = -1;
@@ -75,6 +76,7 @@ static void finish_move(Game *game, const Move *move)
 
     game->winner = rules_winner(&game->board);
     if (game->winner >= 0) {
+        game->win_timer = 0;
         game->screen = SCREEN_WINNER;
         return;
     }
@@ -161,6 +163,7 @@ void game_update(Game *game)
 {
     ++game->tick;
     if (game->check_timer > 0) --game->check_timer;
+    if (game->screen == SCREEN_WINNER) ++game->win_timer;
 
     if (game->screen == SCREEN_PLAY && game->thinking > 0 && --game->thinking == 0) {
         Move move = ai_choose(&game->board, game->turn, game->settings.improved_ai);
