@@ -13,9 +13,7 @@
 /* Colours copied from the original game's P_color calls. */
 static const Color WHITE = {255, 255, 255};
 static const Color BLACK = {0, 0, 0};
-static const Color NAVY_MENU = {0, 0, 64};
-static const Color NAVY_PLAY = {0, 0, 32};
-static const Color PLAY_VEIL = {0, 0, 24};
+static const Color BACKDROP = {12, 12, 12};
 static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
 static const Color SETTING_BOX_ON = {0, 95, 0};
@@ -133,10 +131,10 @@ static void draw_menu(Art *art, const Game *game, int portrait)
     int w = layout_width(portrait);
     int h = layout_height(portrait);
 
-    art_clear(art, NAVY_MENU);
+    art_clear(art, BACKDROP);
     draw_tiles(art, portrait);
     art->alpha = 0.45f;
-    art->color = (Color){0, 0, 40};
+    art->color = BLACK;
     art_rect(art, 0.0f, 0.0f, (float)w, (float)h);
     art->alpha = 1.0f;
     draw_logo(art, portrait);
@@ -225,15 +223,15 @@ static void draw_guide(Art *art, int portrait, int row, int col)
 
 static void draw_board(Art *art, const Game *game, int portrait)
 {
-    art_clear(art, NAVY_PLAY);
+    art_clear(art, BACKDROP);
 
-    /* The no-sound build's menu tiles are reused here as a dimmed backdrop,
-       so the finished board still sits on the familiar checker pattern. */
+    /* The no-sound build's menu tiles are reused here as a dimmed backdrop.
+       A neutral veil keeps the checker pattern visible without any blue tint. */
     int w = layout_width(portrait);
     int h = layout_height(portrait);
     draw_tiles(art, portrait);
-    art->alpha = 0.62f;
-    art->color = PLAY_VEIL;
+    art->alpha = 0.45f;
+    art->color = BLACK;
     art_rect(art, 0.0f, 0.0f, (float)w, (float)h);
     art->alpha = 1.0f;
     art->color = WHITE;
@@ -554,12 +552,12 @@ static float winner_banner_drift(const Game *game)
 
 static void draw_winner(Art *art, const Game *game, int portrait)
 {
-    /* The original no-sound build keeps the finished board, orange move
-       brackets and grey captured pieces visible behind the banner. */
+    /* This is the whole winner animation from the no-sound build: the
+       finished board, orange move brackets, grey captured pieces and a
+       slowly drifting banner. No extra logo or impact text is added. */
     draw_board(art, game, portrait);
     effects_draw_check(art, game, portrait);
     draw_status(art, game, portrait);
-    effects_draw_win(art, game, portrait);
 
     float drift = winner_banner_drift(game);
     art->color = WHITE;

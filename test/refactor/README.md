@@ -14,7 +14,7 @@ its own file:
 | `src/input.c` | keyboard, mouse and controller translation |
 | `src/game.c` | screen state machine, selection, turns, win detection |
 | `src/menu.c` | menu item names and settings status text |
-| `src/render.c` | draws every screen, checkerboard backdrop and turn indicator |
+| `src/render.c` | draws every screen, checkerboard backdrop, turn indicator and drifting winner banner |
 | `src/art.c` | SDL texture cache, tinted sprites, rectangles and clears |
 | `src/font.c` | zxfont glyph mapping and text layout |
 | `src/board.c` | new board, hidden terrain numbers and piece values |
@@ -22,7 +22,7 @@ its own file:
 | `src/ai.c` | computer player (steady classic, deep-search improved) |
 | `src/layout.c` | landscape/portrait geometry and hit testing |
 | `src/config.c` | fresh session-only settings (nothing saved) |
-| `src/effects.c` | check badge, winner targeting, spin-in shogun and logo impact |
+| `src/effects.c` | check shogun badge |
 | `src/types.h` | shared plain structs and enums |
 | `src/assets.h` | the original embedded image tables (data only) |
 
