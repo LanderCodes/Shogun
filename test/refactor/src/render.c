@@ -1,6 +1,7 @@
 #include "render.h"
 
 #include "board.h"
+#include "effects.h"
 #include "font.h"
 #include "layout.h"
 #include "menu.h"
@@ -18,6 +19,10 @@ static const Color BOARD_FRAME = {90, 90, 120};
 static const Color GOLD = {255, 255, 0};
 static const Color SETTING_ON = {80, 255, 80};
 static const Color SETTING_OFF = {255, 90, 90};
+static const Color SETTING_BOX_ON = {0, 100, 0};
+static const Color SETTING_BOX_ON_LIGHT = {0, 170, 0};
+static const Color SETTING_BOX_OFF = {120, 0, 0};
+static const Color SETTING_BOX_OFF_LIGHT = {190, 0, 0};
 static const Color HOVER = {80, 255, 80};
 static const Color OLIVE = {128, 128, 0};
 static const Color OLIVE_LIGHT = {159, 159, 63};
@@ -98,6 +103,23 @@ static Color box_highlight(Color base)
     return (Color){159, 63, 191};
 }
 
+static void menu_box_colors(int portrait, int index, const Settings *settings,
+                            Color *base, Color *highlight)
+{
+    if (index == 3) {
+        if (settings->show_moves) {
+            *base = SETTING_BOX_ON;
+            *highlight = SETTING_BOX_ON_LIGHT;
+        } else {
+            *base = SETTING_BOX_OFF;
+            *highlight = SETTING_BOX_OFF_LIGHT;
+        }
+        return;
+    }
+    *base = box_color(portrait, index);
+    *highlight = box_highlight(*base);
+}
+
 static Color menu_text_color(int index, const Settings *settings)
 {
     if (index == 3) return settings->show_moves ? SETTING_ON : SETTING_OFF;
@@ -121,14 +143,16 @@ static void draw_menu(Art *art, const Game *game, int portrait)
     for (int i = 0; i < MENU_ITEMS; ++i) {
         Rect box;
         layout_menu_item(portrait, i, &box);
-        Color base = box_color(portrait, i);
+        Color base;
+        Color highlight;
         int active = i == game->menu_cursor;
+        menu_box_colors(portrait, i, &game->settings, &base, &highlight);
 
         art->alpha = active ? 0.70f : 1.0f;
         art->color = active ? GOLD : WHITE;
         art_rect(art, box.x, box.y, box.w, box.h);
         art->alpha = active ? 0.80f : 1.0f;
-        art->color = active ? box_highlight(base) : base;
+        art->color = active ? highlight : base;
         art_rect(art, box.x + 2.0f, box.y + 2.0f, box.w - 4.0f, box.h - 4.0f);
         art->alpha = 1.0f;
         art->color = WHITE;
@@ -353,6 +377,7 @@ static void draw_status(Art *art, const Game *game, int portrait)
 static void draw_pause(Art *art, const Game *game, int portrait)
 {
     draw_board(art, game, portrait);
+    effects_draw_check(art, game, portrait);
     draw_status(art, game, portrait);
     if (portrait) return;
 
@@ -439,10 +464,10 @@ static void draw_help(Art *art, const Game *game, int portrait)
         {226.0f, "In a two player game share the mouse and take turns -"},
         {246.0f, "white plays up the board, red plays down it."},
         {278.0f, "Press F to switch fullscreen on and off."},
-        {374.0f, "CLASSIC is the original 2013 computer player. IMPROVED"},
-        {394.0f, "follows the same plan but checks every move for danger"},
-        {414.0f, "before making it, so it is much harder to beat. Choose it"},
-        {434.0f, "on the main menu."}
+        {374.0f, "CLASSIC looks a move or two ahead and plays steadily."},
+        {394.0f, "IMPROVED searches further, weighs material and shogun"},
+        {414.0f, "safety, and is much harder to beat. Choose it on the"},
+        {434.0f, "main menu."}
     };
     static const HelpLine page3[] = {
         {82.0f, "Aim to corner and capture the enemy SHOGUN while"},
@@ -492,6 +517,7 @@ static void draw_winner(Art *art, const Game *game, int portrait)
        gfxtext banner over it. */
     draw_board(art, game, portrait);
     draw_status(art, game, portrait);
+    effects_draw_win(art, game, portrait);
     art->color = WHITE;
     art_image(art, 5, 4, portrait ? 240.0f : 758.0f,
               portrait ? 430.0f : 230.0f, 0.9f, 0.9f);
@@ -507,6 +533,7 @@ void render_screen(Art *art, const Game *game, int portrait, uint32_t now)
         break;
     case SCREEN_PLAY:
         draw_board(art, game, portrait);
+        effects_draw_check(art, game, portrait);
         draw_status(art, game, portrait);
         break;
     case SCREEN_PAUSE:

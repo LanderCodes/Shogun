@@ -19,9 +19,10 @@ its own file:
 | `src/font.c` | zxfont glyph mapping and text layout |
 | `src/board.c` | new board, hidden terrain numbers and piece values |
 | `src/rules.c` | legal move generation, check and winner tests |
-| `src/ai.c` | computer player (classic and improved settings) |
+| `src/ai.c` | computer player (steady classic, deep-search improved) |
 | `src/layout.c` | landscape/portrait geometry and hit testing |
 | `src/config.c` | fresh session-only settings (nothing saved) |
+| `src/effects.c` | check shogun badge and winner shogun animation |
 | `src/types.h` | shared plain structs and enums |
 | `src/assets.h` | the original embedded image tables (data only) |
 

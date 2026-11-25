@@ -18,6 +18,7 @@ add_executable(shogun
     src/ai.c
     src/board.c
     src/config.c
+    src/effects.c
     src/font.c
     src/game.c
     src/input.c

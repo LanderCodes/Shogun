@@ -2,7 +2,9 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "ai.h"
 #include "game.h"
 #include "layout.h"
 #include "rules.h"
@@ -84,6 +86,27 @@ int main(void)
     /* A missing shogun ends the game. */
     game.board.piece[0][3].type = PIECE_NONE;
     assert(rules_winner(&game.board) == SIDE_WHITE);
+
+    /* Both computer settings must take a shogun capture when it is offered. */
+    Board ai_board;
+    memset(&ai_board, 0, sizeof(ai_board));
+    for (int row = 0; row < BOARD_SIZE; ++row) {
+        for (int col = 0; col < BOARD_SIZE; ++col) {
+            ai_board.terrain[row][col].value = 1;
+        }
+    }
+    ai_board.piece[7][4] = (Piece){PIECE_SHOGUN, SIDE_WHITE, 1};
+    ai_board.piece[7][3] = (Piece){PIECE_PAWN, SIDE_WHITE, 1};
+    ai_board.piece[7][2] = (Piece){PIECE_PAWN, SIDE_WHITE, 1};
+    ai_board.piece[6][3] = (Piece){PIECE_SHOGUN, SIDE_RED, 1};
+    ai_board.piece[0][3] = (Piece){PIECE_PAWN, SIDE_RED, 1};
+    ai_board.piece[0][4] = (Piece){PIECE_PAWN, SIDE_RED, 1};
+
+    for (int improved = 0; improved < 2; ++improved) {
+        Move move = ai_choose(&ai_board, SIDE_WHITE, improved);
+        assert(move.from.row == 7 && move.from.col == 3);
+        assert(move.to.row == 6 && move.to.col == 3);
+    }
 
     puts("logic test: ok");
     return 0;
