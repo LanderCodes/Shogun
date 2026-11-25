@@ -220,6 +220,13 @@ void w2c_env_P_color(struct w2c_env *env, u32 r, u32 g, u32 b)
 void w2c_env_P_rect(struct w2c_env *env, f32 x, f32 y, f32 w, f32 h)
 {
     (void)env;
+    /* The menu ticker's background is two full-width rects just above the
+       bottom bar. Drop them along with the glyphs that sit on top. */
+    if ((int)roundf(x) == -2 && (int)roundf(w) == app.lw + 4 &&
+        ((int)roundf(h) == 29 || (int)roundf(h) == 25) &&
+        y > (f32)app.lh - 56.0f && y < (f32)app.lh - 47.0f) {
+        return;
+    }
     if ((int)roundf(y) == app.lh - 8) {
         return;
     }

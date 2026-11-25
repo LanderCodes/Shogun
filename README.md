@@ -151,8 +151,10 @@ draws it character by character with `zxfont` glyphs (`id == 7`) in a narrow ban
 just above the bottom bar (`y` around 38-40 pixels above the logical height).
 The host drops those specific glyph draws and draws nothing in their place.
 Other text rows, including the pause/menu hint and the help screen, are outside
-that band and remain untouched. The legacy host applies the same filter and no
-longer draws its own credit line.
+that band and remain untouched. The host also drops the two full-width
+`P_rect` fills that form the ticker's background strip. The legacy host filters
+the same ticker glyphs (its existing bottom-bar rule already skips the strip)
+and no longer draws its own credit line.
 
 The host also skips the bottom 8-pixel bar drawn by the game, matching the
 earlier experimental no-sound behavior.
