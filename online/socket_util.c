@@ -155,10 +155,10 @@ int online_discover(char *host, size_t host_size, int *port)
     target.sin_family = AF_INET;
     target.sin_port = htons((unsigned short)ONLINE_DEFAULT_PORT);
     target.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    (void)sendto(fd, request, strlen(request), 0,
+    (void)sendto(fd, request, (int)strlen(request), 0,
                  (struct sockaddr *)&target, sizeof(target));
     target.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-    (void)sendto(fd, request, strlen(request), 0,
+    (void)sendto(fd, request, (int)strlen(request), 0,
                  (struct sockaddr *)&target, sizeof(target));
 
     fd_set readable;

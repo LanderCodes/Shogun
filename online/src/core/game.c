@@ -389,8 +389,8 @@ void game_mouse_move(Game *game, float x, float y, int portrait)
         game->hover_item = layout_winner_button_at(portrait, x, y);
     }
 
-    int row;
-    int col;
+    int row = 0;
+    int col = 0;
     game->has_hover = game->screen == SCREEN_PLAY &&
                       layout_cell_at(portrait, x, y, &row, &col);
     if (game->has_hover) {

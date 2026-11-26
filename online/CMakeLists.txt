@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 if(MSVC)
     set(CMAKE_C_STANDARD 11)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
 set(SHOGUN_COMPILE_OPTIONS -O2 -Wall -Wextra)
