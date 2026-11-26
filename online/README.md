@@ -25,8 +25,9 @@ sudo dnf install gcc cmake pkgconf-pkg-config SDL2-devel git
 ```
 
 Building from source on Windows needs a C99 compiler, CMake, pkgconf and SDL2.
-Playing the prepared Windows build needs none of those tools; see the Windows
-section below.
+Use `online/build-windows.ps1` or `online/build-windows.bat`; see the Windows
+build section below. Playing the prepared Windows build needs none of those
+tools.
 
 ## Build
 
@@ -48,6 +49,26 @@ CMake, Git or compiler is needed.
 
 If you are hosting the server on Windows, also include `shogun-server.exe` and
 `SDL2.dll` in the same folder.
+
+## Windows build
+
+From PowerShell in the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows.ps1
+```
+
+Or double-click `online\build-windows.bat`.
+
+The script expects MinGW-w64, CMake, pkg-config and SDL2 development files in
+`C:\msys64\ucrt64\bin`. For another MinGW-w64 installation:
+
+```powershell
+.\online\build-windows.ps1 -MingwBin "C:\path\to\mingw\bin"
+```
+
+It runs the tests unless `-SkipTests` is passed, then copies `shogun.exe`,
+`shogun-server.exe` and `SDL2.dll` to `online\windows-release`.
 
 ## Run the server
 
