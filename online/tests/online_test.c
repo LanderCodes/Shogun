@@ -192,6 +192,13 @@ static void check_loopback(void)
     assert(watcher->board.piece[move.to.row][move.to.col].type == moved.type);
     assert(watcher->board.piece[move.to.row][move.to.col].side == moved.side);
     assert(watcher->turn != before);
+    assert(!watcher->has_pending_move);
+
+    pump(&a, &b, &ga, &gb, 100);
+    assert(mover->online_phase == ONLINE_PLAYING);
+    assert(mover->screen == SCREEN_PLAY);
+    assert(strstr(mover->online_message, "INVALID") == NULL);
+    assert(strstr(watcher->online_message, "OPPONENT LEFT") == NULL);
 
     online_net_send_leave(&a, ga.match_id);
     online_net_send_leave(&b, gb.match_id);

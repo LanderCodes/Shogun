@@ -90,10 +90,10 @@ static void activate_menu(Game *game)
     }
 }
 
-static void finish_move(Game *game, const Move *move)
+static void finish_move(Game *game, const Move *move, int local)
 {
     board_apply(&game->board, move);
-    if (game->local_side >= 0) {
+    if (local && game->local_side >= 0) {
         game->has_pending_move = 1;
         game->pending_move = *move;
     }
@@ -132,7 +132,7 @@ static void select_cell(Game *game, int row, int col)
         for (int i = 0; i < game->move_count; ++i) {
             const Move *move = &game->moves[i];
             if (move->to.row == row && move->to.col == col) {
-                finish_move(game, move);
+                finish_move(game, move, 1);
                 return;
             }
         }
@@ -213,7 +213,7 @@ void game_update(Game *game)
             game->turn = other_side(game->turn);
             set_check(game, NULL);
         } else {
-            finish_move(game, &move);
+            finish_move(game, &move, 0);
         }
     }
 }
@@ -579,7 +579,7 @@ int game_apply_remote_move(Game *game, const Move *move)
                                legal, MAX_MOVES);
     for (int i = 0; i < count; ++i) {
         if (legal[i].to.row == move->to.row && legal[i].to.col == move->to.col) {
-            finish_move(game, &legal[i]);
+            finish_move(game, &legal[i], 0);
             return 1;
         }
     }
