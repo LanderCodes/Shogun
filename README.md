@@ -22,6 +22,7 @@ live in `original/`.
 ├── tests/
 │   ├── logic_test.c        headless game-logic and glyph checks
 │   └── smoke_test.c        dummy-SDL rendering and rematch checks
+├── online/                 self-contained build with two-player online mode
 ├── original/               upstream README, executable and earlier no-sound copy
 └── alt/                    generated C port and legacy wasm3 build
 ```
@@ -54,18 +55,102 @@ live in `original/`.
   No UI string draws a blank or unrelated symbol, and there is no critical-hit
   text anywhere in this build.
 
-## Build and test
+## Install and build
+
+You need a C99 compiler, CMake 3.16+, pkg-config/pkgconf, SDL2 and Git. No audio
+libraries are used and no sound device is opened.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/LanderCodes/Shogun.git
+cd Shogun
+```
+
+### Linux
+
+Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install build-essential cmake pkg-config libsdl2-dev git
+```
+
+Fedora:
+
+```bash
+sudo dnf install gcc cmake pkgconf-pkg-config SDL2-devel git
+```
+
+Build and test both the single-player/root build and the online build:
 
 ```bash
 cmake -S . -B build
 cmake --build build -j2
 ctest --test-dir build --output-on-failure
-./build/shogun
+
+cmake -S online -B online/build
+cmake --build online/build -j2
+ctest --test-dir online/build --output-on-failure
 ```
 
-Requires a C99 compiler, CMake, pkg-config and SDL2. No audio libraries are
-used and no sound device is opened. CTest runs the smoke test with the dummy SDL
-video driver and software renderer, so it works without a display.
+Run them:
+
+```bash
+./build/shogun
+./online/build/shogun
+```
+
+CTest runs smoke tests with the dummy SDL video driver and software renderer,
+so the tests work without a display.
+
+### Windows
+
+Use MSYS2 with the UCRT64 toolchain. Install MSYS2 from https://www.msys2.org/,
+open the **MSYS2 UCRT64** terminal, and run:
+
+```bash
+pacman -Syu
+```
+
+Close and reopen the UCRT64 terminal if `pacman` asks you to, then install the
+build tools:
+
+```bash
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake \
+  mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-SDL2 git
+```
+
+From the repository directory in that same UCRT64 terminal:
+
+```bash
+cmake -S . -B build -G "MinGW Makefiles"
+cmake --build build -j2
+ctest --test-dir build --output-on-failure
+
+cmake -S online -B online/build -G "MinGW Makefiles"
+cmake --build online/build -j2
+ctest --test-dir online/build --output-on-failure
+```
+
+Run from that terminal:
+
+```bash
+./build/shogun.exe
+./online/build/shogun.exe
+```
+
+If you want to launch `shogun.exe` from File Explorer instead, copy
+`C:\msys64\ucrt64\bin\SDL2.dll` next to the `.exe`, or add
+`C:\msys64\ucrt64\bin` to your Windows `PATH`.
+
+### Online setup
+
+The `online/` build adds `TWO PLAYERS` -> `ONLINE GAME`. The setup menu asks for
+the access token and server address. The server binary is
+`online/build/shogun-server` on Linux and `online\build\shogun-server.exe` on
+Windows. See `online/README.md` for server, token, VPN/port-forward and
+troubleshooting instructions, and `online/notes.md` for implementation notes.
 
 ## Differences from the builds in `alt/`
 
