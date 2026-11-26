@@ -56,6 +56,14 @@ void input_event(Input *input, const SDL_Event *event, Game *game, App *app)
             game_setup_backspace(game);
             break;
         }
+        if (game_text_input_active(game)) {
+            if (key == SDLK_RETURN || key == SDLK_KP_ENTER) {
+                game_key(game, 5);
+            } else if (key == SDLK_ESCAPE) {
+                game_key(game, 6);
+            }
+            break;
+        }
         if (key == SDLK_F11 || key == SDLK_f ||
             (key == SDLK_RETURN && (mod & KMOD_ALT))) {
             app_toggle_fullscreen(app);
@@ -106,6 +114,11 @@ void input_event(Input *input, const SDL_Event *event, Game *game, App *app)
 
 void input_poll(Input *input, Uint32 now, Game *game)
 {
+    if (game_text_input_active(game)) {
+        for (int i = 0; i < 7; ++i) input->previous[i] = 0;
+        return;
+    }
+
     int state[7] = {0};
     if (input->pad) {
         SDL_GameController *pad = input->pad;

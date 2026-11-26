@@ -57,8 +57,7 @@ int main(int argc, char **argv)
         }
         if (!running) break;
 
-        int typing = game.screen == SCREEN_ONLINE_NAME ||
-                     (game.screen == SCREEN_ONLINE_SETUP && game.setup_typing);
+        int typing = game_text_input_active(&game);
         if (typing && !text_input) {
             SDL_StartTextInput();
             text_input = 1;

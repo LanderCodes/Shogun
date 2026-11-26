@@ -404,6 +404,12 @@ int game_hovering_button(const Game *game)
     return game->hover_item >= 0;
 }
 
+int game_text_input_active(const Game *game)
+{
+    return game->screen == SCREEN_ONLINE_NAME ||
+           (game->screen == SCREEN_ONLINE_SETUP && game->setup_typing);
+}
+
 void game_mouse_down(Game *game, float x, float y, int portrait)
 {
     game_mouse_move(game, x, y, portrait);

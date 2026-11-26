@@ -58,6 +58,7 @@ void game_key(Game *game, int code);
 void game_mouse_move(Game *game, float x, float y, int portrait);
 void game_mouse_down(Game *game, float x, float y, int portrait);
 int game_hovering_button(const Game *game);
+int game_text_input_active(const Game *game);
 void game_name_input(Game *game, const char *text);
 void game_name_backspace(Game *game);
 void game_setup_text(Game *game, const char *text);

@@ -45,6 +45,15 @@ if exist "%~dp0online\CMakeLists.txt" (
     )
 )
 
+git rev-parse --is-inside-work-tree >nul 2>nul
+if not errorlevel 1 (
+    git pull --ff-only
+    if errorlevel 1 (
+        set "FAILMSG=Git pull failed."
+        goto :fail
+    )
+)
+
 winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
 if errorlevel 1 (
     set "FAILMSG=Git installation failed."
