@@ -9,7 +9,7 @@
 
 ## Directory layout
 
-- Make `/refactor` the main directory (promote `test/refactor` to the repository root as `refactor/`).
+- Make the refactor the repository root (per follow-up): previous root files move to `original/` and the old `test/` builds to `alt/`.
 - Split the source into logical subdirectories, for example:
   - `refactor/src/core/` — board, rules, AI, game state
   - `refactor/src/render/` — renderer, effects, font, layout
