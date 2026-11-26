@@ -51,6 +51,7 @@ if errorlevel 1 exit /b 1
 "%VCPKG_ROOT%\vcpkg.exe" install sdl2:x64-windows-static
 if errorlevel 1 exit /b 1
 
+if exist "online\build-client-static" rmdir /s /q "online\build-client-static"
 cmake -S online -B online\build-client-static -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 if errorlevel 1 exit /b 1
 cmake --build online\build-client-static --config Release --target shogun --parallel

@@ -1,3 +1,5 @@
+#include "client.h"
+
 #include <SDL2/SDL.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -7,7 +9,6 @@
 
 #include "core/config.h"
 #include "core/game.h"
-#include "client.h"
 #include "render/art.h"
 #include "render/render.h"
 

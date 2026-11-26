@@ -2,6 +2,14 @@
 
 #include "core/types.h"
 
+static void set_rect(Rect *out, float x, float y, float w, float h)
+{
+    out->x = x;
+    out->y = y;
+    out->w = w;
+    out->h = h;
+}
+
 int layout_width(int portrait) { return portrait ? PORTRAIT_W : LOGICAL_W; }
 int layout_height(int portrait) { return portrait ? PORTRAIT_H : LOGICAL_H; }
 float layout_cell(int portrait) { (void)portrait; return 60.0f; }
@@ -94,8 +102,8 @@ int layout_menu_item_at(int portrait, float x, float y)
 
 void layout_pause_control(int portrait, Rect *out)
 {
-    if (portrait) *out = (Rect){422.0f, 4.0f, 54.0f, 48.0f};
-    else *out = (Rect){558.0f, 476.0f, 354.0f, 44.0f};
+    if (portrait) set_rect(out, 422.0f, 4.0f, 54.0f, 48.0f);
+    else set_rect(out, 558.0f, 476.0f, 354.0f, 44.0f);
 }
 
 void layout_pause_button(int portrait, int index, Rect *outer, Rect *inner)
@@ -103,11 +111,11 @@ void layout_pause_button(int portrait, int index, Rect *outer, Rect *inner)
     (void)portrait;
     /* index 0 = CONTINUE, 1 = MAIN MENU. */
     if (index == 0) {
-        *outer = (Rect){88.0f, 228.0f, 364.0f, 54.0f};
-        *inner = (Rect){90.0f, 230.0f, 360.0f, 50.0f};
+        set_rect(outer, 88.0f, 228.0f, 364.0f, 54.0f);
+        set_rect(inner, 90.0f, 230.0f, 360.0f, 50.0f);
     } else {
-        *outer = (Rect){88.0f, 294.0f, 364.0f, 54.0f};
-        *inner = (Rect){90.0f, 296.0f, 360.0f, 50.0f};
+        set_rect(outer, 88.0f, 294.0f, 364.0f, 54.0f);
+        set_rect(inner, 90.0f, 296.0f, 360.0f, 50.0f);
     }
 }
 
@@ -115,19 +123,19 @@ void layout_winner_button(int portrait, int index, Rect *outer, Rect *inner)
 {
     if (index == 0) {
         if (portrait) {
-            *outer = (Rect){38.0f, 632.0f, 404.0f, 58.0f};
-            *inner = (Rect){40.0f, 634.0f, 400.0f, 54.0f};
+            set_rect(outer, 38.0f, 632.0f, 404.0f, 58.0f);
+            set_rect(inner, 40.0f, 634.0f, 400.0f, 54.0f);
         } else {
-            *outer = (Rect){558.0f, 300.0f, 354.0f, 50.0f};
-            *inner = (Rect){560.0f, 302.0f, 350.0f, 46.0f};
+            set_rect(outer, 558.0f, 300.0f, 354.0f, 50.0f);
+            set_rect(inner, 560.0f, 302.0f, 350.0f, 46.0f);
         }
     } else {
         if (portrait) {
-            *outer = (Rect){38.0f, 700.0f, 404.0f, 58.0f};
-            *inner = (Rect){40.0f, 702.0f, 400.0f, 54.0f};
+            set_rect(outer, 38.0f, 700.0f, 404.0f, 58.0f);
+            set_rect(inner, 40.0f, 702.0f, 400.0f, 54.0f);
         } else {
-            *outer = (Rect){558.0f, 360.0f, 354.0f, 50.0f};
-            *inner = (Rect){560.0f, 362.0f, 350.0f, 46.0f};
+            set_rect(outer, 558.0f, 360.0f, 354.0f, 50.0f);
+            set_rect(inner, 560.0f, 362.0f, 350.0f, 46.0f);
         }
     }
 }
@@ -150,12 +158,12 @@ void layout_mode_button(int portrait, int index, Rect *outer, Rect *inner)
     if (index > 2) index = 2;
     if (portrait) {
         float ys[3] = {560.0f, 630.0f, 700.0f};
-        *outer = (Rect){38.0f, ys[index], 404.0f, 58.0f};
-        *inner = (Rect){40.0f, ys[index] + 2.0f, 400.0f, 54.0f};
+        set_rect(outer, 38.0f, ys[index], 404.0f, 58.0f);
+        set_rect(inner, 40.0f, ys[index] + 2.0f, 400.0f, 54.0f);
     } else {
         float ys[3] = {210.0f, 280.0f, 350.0f};
-        *outer = (Rect){250.0f, ys[index], 460.0f, 56.0f};
-        *inner = (Rect){252.0f, ys[index] + 2.0f, 456.0f, 52.0f};
+        set_rect(outer, 250.0f, ys[index], 460.0f, 56.0f);
+        set_rect(inner, 252.0f, ys[index] + 2.0f, 456.0f, 52.0f);
     }
 }
 
@@ -173,14 +181,14 @@ int layout_mode_button_at(int portrait, float x, float y)
 
 void layout_name_box(int portrait, Rect *out)
 {
-    if (portrait) *out = (Rect){38.0f, 300.0f, 404.0f, 90.0f};
-    else *out = (Rect){180.0f, 220.0f, 600.0f, 80.0f};
+    if (portrait) set_rect(out, 38.0f, 300.0f, 404.0f, 90.0f);
+    else set_rect(out, 180.0f, 220.0f, 600.0f, 80.0f);
 }
 
 void layout_setup_field(int portrait, Rect *out)
 {
-    if (portrait) *out = (Rect){38.0f, 230.0f, 404.0f, 80.0f};
-    else *out = (Rect){180.0f, 150.0f, 600.0f, 70.0f};
+    if (portrait) set_rect(out, 38.0f, 230.0f, 404.0f, 80.0f);
+    else set_rect(out, 180.0f, 150.0f, 600.0f, 70.0f);
 }
 
 void layout_setup_button(int portrait, int index, Rect *outer, Rect *inner)
@@ -189,12 +197,12 @@ void layout_setup_button(int portrait, int index, Rect *outer, Rect *inner)
     if (index > 1) index = 1;
     if (portrait) {
         float ys[2] = {500.0f, 570.0f};
-        *outer = (Rect){38.0f, ys[index], 404.0f, 58.0f};
-        *inner = (Rect){40.0f, ys[index] + 2.0f, 400.0f, 54.0f};
+        set_rect(outer, 38.0f, ys[index], 404.0f, 58.0f);
+        set_rect(inner, 40.0f, ys[index] + 2.0f, 400.0f, 54.0f);
     } else {
         float ys[2] = {350.0f, 420.0f};
-        *outer = (Rect){250.0f, ys[index], 460.0f, 56.0f};
-        *inner = (Rect){252.0f, ys[index] + 2.0f, 456.0f, 52.0f};
+        set_rect(outer, 250.0f, ys[index], 460.0f, 56.0f);
+        set_rect(inner, 252.0f, ys[index] + 2.0f, 456.0f, 52.0f);
     }
 }
 

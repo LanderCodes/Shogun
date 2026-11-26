@@ -19,7 +19,12 @@ static void set_check(Game *game, const Cell *moved_to)
     }
 
     game->check_timer = rules_in_check(&game->board, game->turn) ? 80 : 0;
-    game->check_cell = game->check_timer > 0 ? *moved_to : (Cell){0, 0};
+    if (game->check_timer > 0) {
+        game->check_cell = *moved_to;
+    } else {
+        game->check_cell.row = 0;
+        game->check_cell.col = 0;
+    }
 }
 
 static void start_game(Game *game, int two_player)
@@ -44,7 +49,11 @@ static void start_game(Game *game, int two_player)
     game->local_side = -1;
     game->online_phase = ONLINE_NONE;
     game->has_pending_move = 0;
-    game->pending_move = (Move){{0, 0}, {0, 0}, 0};
+    game->pending_move.from.row = 0;
+    game->pending_move.from.col = 0;
+    game->pending_move.to.row = 0;
+    game->pending_move.to.col = 0;
+    game->pending_move.capture = 0;
 }
 
 static void restart_game(Game *game)
@@ -384,7 +393,10 @@ void game_mouse_move(Game *game, float x, float y, int portrait)
     int col;
     game->has_hover = game->screen == SCREEN_PLAY &&
                       layout_cell_at(portrait, x, y, &row, &col);
-    if (game->has_hover) game->hover_cell = (Cell){row, col};
+    if (game->has_hover) {
+        game->hover_cell.row = row;
+        game->hover_cell.col = col;
+    }
 }
 
 int game_hovering_button(const Game *game)

@@ -3,6 +3,16 @@ project(shogun_online C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+if(MSVC)
+    set(CMAKE_C_STANDARD 11)
+endif()
+
+set(SHOGUN_COMPILE_OPTIONS -O2 -Wall -Wextra)
+set(SHOGUN_TEST_COMPILE_OPTIONS -UNDEBUG -Wall -Wextra)
+if(MSVC)
+    set(SHOGUN_COMPILE_OPTIONS /W4)
+    set(SHOGUN_TEST_COMPILE_OPTIONS /UNDEBUG /W4)
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
@@ -72,7 +82,7 @@ target_link_libraries(shogun PRIVATE ${SHOGUN_SDL2} ${SHOGUN_MATH_LIB})
 if(WIN32)
     target_link_libraries(shogun PRIVATE ws2_32)
 endif()
-target_compile_options(shogun PRIVATE -O2 -Wall -Wextra)
+target_compile_options(shogun PRIVATE ${SHOGUN_COMPILE_OPTIONS})
 
 add_executable(shogun-server server_main.c server.c
     ${ONLINE_COMMON_SOURCES})
@@ -82,7 +92,7 @@ target_include_directories(shogun-server PRIVATE
 if(WIN32)
     target_link_libraries(shogun-server PRIVATE ws2_32)
 endif()
-target_compile_options(shogun-server PRIVATE -O2 -Wall -Wextra)
+target_compile_options(shogun-server PRIVATE ${SHOGUN_COMPILE_OPTIONS})
 
 enable_testing()
 
@@ -96,8 +106,10 @@ add_executable(logic_test
 target_include_directories(logic_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(logic_test PRIVATE m)
-target_compile_options(logic_test PRIVATE -UNDEBUG -Wall -Wextra)
+if(SHOGUN_MATH_LIB)
+    target_link_libraries(logic_test PRIVATE ${SHOGUN_MATH_LIB})
+endif()
+target_compile_options(logic_test PRIVATE ${SHOGUN_TEST_COMPILE_OPTIONS})
 add_test(NAME logic COMMAND logic_test)
 
 add_executable(smoke_test
@@ -110,7 +122,7 @@ target_include_directories(smoke_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(smoke_test PRIVATE ${SHOGUN_SDL2} ${SHOGUN_MATH_LIB})
-target_compile_options(smoke_test PRIVATE -Wall -Wextra)
+target_compile_options(smoke_test PRIVATE ${SHOGUN_COMPILE_OPTIONS})
 add_test(NAME smoke COMMAND smoke_test)
 set_tests_properties(smoke PROPERTIES
     ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_RENDER_DRIVER=software")
@@ -125,9 +137,11 @@ add_executable(online_test
 target_include_directories(online_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(online_test PRIVATE m)
+if(SHOGUN_MATH_LIB)
+    target_link_libraries(online_test PRIVATE ${SHOGUN_MATH_LIB})
+endif()
 if(WIN32)
     target_link_libraries(online_test PRIVATE ws2_32)
 endif()
-target_compile_options(online_test PRIVATE -UNDEBUG -Wall -Wextra)
+target_compile_options(online_test PRIVATE ${SHOGUN_TEST_COMPILE_OPTIONS})
 add_test(NAME online COMMAND online_test)

@@ -11,6 +11,15 @@
 #include "render/layout.h"
 #include "ui/menu.h"
 
+static Piece make_piece(PieceType type, Side side, int value)
+{
+    Piece piece;
+    piece.type = type;
+    piece.side = side;
+    piece.value = value;
+    return piece;
+}
+
 static int piece_count(const Game *game, Side side)
 {
     int count = 0;
@@ -157,12 +166,12 @@ int main(void)
             ai_board.terrain[row][col].value = 1;
         }
     }
-    ai_board.piece[7][4] = (Piece){PIECE_SHOGUN, SIDE_WHITE, 1};
-    ai_board.piece[7][3] = (Piece){PIECE_PAWN, SIDE_WHITE, 1};
-    ai_board.piece[7][2] = (Piece){PIECE_PAWN, SIDE_WHITE, 1};
-    ai_board.piece[6][3] = (Piece){PIECE_SHOGUN, SIDE_RED, 1};
-    ai_board.piece[0][3] = (Piece){PIECE_PAWN, SIDE_RED, 1};
-    ai_board.piece[0][4] = (Piece){PIECE_PAWN, SIDE_RED, 1};
+    ai_board.piece[7][4] = make_piece(PIECE_SHOGUN, SIDE_WHITE, 1);
+    ai_board.piece[7][3] = make_piece(PIECE_PAWN, SIDE_WHITE, 1);
+    ai_board.piece[7][2] = make_piece(PIECE_PAWN, SIDE_WHITE, 1);
+    ai_board.piece[6][3] = make_piece(PIECE_SHOGUN, SIDE_RED, 1);
+    ai_board.piece[0][3] = make_piece(PIECE_PAWN, SIDE_RED, 1);
+    ai_board.piece[0][4] = make_piece(PIECE_PAWN, SIDE_RED, 1);
 
     for (int improved = 0; improved < 2; ++improved) {
         Move move = ai_choose(&ai_board, SIDE_WHITE, improved);

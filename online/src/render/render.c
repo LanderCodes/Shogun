@@ -41,6 +41,15 @@ static const Color GUIDE = {255, 160, 0};
 static const Color CHECK = {255, 0, 0};
 static const Color CAPTURED = {128, 128, 128};
 
+static Color make_color(uint8_t r, uint8_t g, uint8_t b)
+{
+    Color color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    return color;
+}
+
 static void label(Art *art, const char *text, float x, float y,
                   float scale, Color color, int centered)
 {
@@ -106,9 +115,9 @@ static Color box_highlight(Color base)
 {
     if (base.r == 128 && base.g == 0) return MAROON_LIGHT;
     if (base.r == 128) return OLIVE_LIGHT;
-    if (base.g == 128 && base.b == 128) return (Color){63, 159, 159};
-    if (base.g == 128) return (Color){63, 159, 63};
-    return (Color){159, 63, 191};
+    if (base.g == 128 && base.b == 128) return make_color(63, 159, 159);
+    if (base.g == 128) return make_color(63, 159, 63);
+    return make_color(159, 63, 191);
 }
 
 static void menu_box_colors(int portrait, int index, const Settings *settings,
@@ -649,7 +658,7 @@ static void draw_help_lines(Art *art, const HelpLine *lines, int count)
 static void draw_help(Art *art, const Game *game, int portrait)
 {
     (void)portrait;
-    art_clear(art, (Color){0, 0, 50});
+    art_clear(art, make_color(0, 0, 50));
 
     static const HelpLine page1[] = {
         {82.0f, "SHOGUN is a one or two"},

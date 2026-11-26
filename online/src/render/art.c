@@ -7,6 +7,15 @@
 
 #define IMAGE_COUNT 8
 
+static Color make_color(uint8_t r, uint8_t g, uint8_t b)
+{
+    Color color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    return color;
+}
+
 static SDL_Texture *base_texture(Art *art, int id)
 {
     if (id < 0 || id >= IMAGE_COUNT || id >= (int)g_image_count) return NULL;
@@ -74,7 +83,7 @@ void art_init(Art *art, SDL_Renderer *renderer)
 {
     memset(art, 0, sizeof(*art));
     art->renderer = renderer;
-    art->color = (Color){255, 255, 255};
+    art->color = make_color(255, 255, 255);
     art->alpha = 1.0f;
 }
 
