@@ -29,9 +29,8 @@ typedef struct {
 } OnlineNet;
 
 const char *online_default_server(void);
-void online_prefs_load(char *token, size_t token_size, char *server,
-                       size_t server_size);
-void online_prefs_save(const char *token, const char *server);
+void online_prefs_load(char *token, size_t token_size);
+void online_prefs_save(const char *token);
 void online_net_init(OnlineNet *net);
 int online_net_connect(OnlineNet *net, const char *name, const char *token);
 int online_net_connect_addr(OnlineNet *net, const char *host, int port,

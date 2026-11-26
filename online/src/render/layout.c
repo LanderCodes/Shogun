@@ -177,17 +177,10 @@ void layout_name_box(int portrait, Rect *out)
     else *out = (Rect){180.0f, 220.0f, 600.0f, 80.0f};
 }
 
-void layout_setup_field(int portrait, int index, Rect *out)
+void layout_setup_field(int portrait, Rect *out)
 {
-    if (index < 0) index = 0;
-    if (index > 1) index = 1;
-    if (portrait) {
-        float ys[2] = {230.0f, 350.0f};
-        *out = (Rect){38.0f, ys[index], 404.0f, 80.0f};
-    } else {
-        float ys[2] = {150.0f, 260.0f};
-        *out = (Rect){180.0f, ys[index], 600.0f, 70.0f};
-    }
+    if (portrait) *out = (Rect){38.0f, 230.0f, 404.0f, 80.0f};
+    else *out = (Rect){180.0f, 150.0f, 600.0f, 70.0f};
 }
 
 void layout_setup_button(int portrait, int index, Rect *outer, Rect *inner)
@@ -207,18 +200,16 @@ void layout_setup_button(int portrait, int index, Rect *outer, Rect *inner)
 
 int layout_setup_item_at(int portrait, float x, float y)
 {
-    for (int i = 0; i < 2; ++i) {
-        Rect field;
-        layout_setup_field(portrait, i, &field);
-        if (x >= field.x && x <= field.x + field.w &&
-            y >= field.y && y <= field.y + field.h) return i;
-    }
+    Rect field;
+    layout_setup_field(portrait, &field);
+    if (x >= field.x && x <= field.x + field.w &&
+        y >= field.y && y <= field.y + field.h) return 0;
     for (int i = 0; i < 2; ++i) {
         Rect outer;
         Rect inner;
         layout_setup_button(portrait, i, &outer, &inner);
         if (x >= outer.x && x <= outer.x + outer.w &&
-            y >= outer.y && y <= outer.y + outer.h) return i + 2;
+            y >= outer.y && y <= outer.y + outer.h) return i + 1;
     }
     return -1;
 }

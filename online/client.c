@@ -67,46 +67,31 @@ static void set_field(char *out, size_t size, const char *value)
     out[n] = '\0';
 }
 
-void online_prefs_load(char *token, size_t token_size, char *server,
-                       size_t server_size)
+void online_prefs_load(char *token, size_t token_size)
 {
     if (token && token_size) token[0] = '\0';
-    if (server && server_size) server[0] = '\0';
     copy_text(token, token_size, getenv("SHOGUN_TOKEN"));
-    copy_text(server, server_size, getenv("SHOGUN_SERVER"));
 
     char path[512];
     pref_path(path, sizeof(path));
     FILE *file = fopen(path, "r");
-    if (!file) {
-        if (server && server_size && !server[0]) {
-            copy_text(server, server_size, online_default_server());
-        }
-        return;
-    }
+    if (!file) return;
     char line[512];
     while (fgets(line, sizeof(line), file)) {
         if (token && token_size && !token[0] && strncmp(line, "TOKEN=", 6) == 0) {
             set_field(token, token_size, line + 6);
-        } else if (server && server_size && !server[0] &&
-                   strncmp(line, "SERVER=", 7) == 0) {
-            set_field(server, server_size, line + 7);
         }
     }
     fclose(file);
-    if (server && server_size && !server[0]) {
-        copy_text(server, server_size, online_default_server());
-    }
 }
 
-void online_prefs_save(const char *token, const char *server)
+void online_prefs_save(const char *token)
 {
     char path[512];
     pref_path(path, sizeof(path));
     FILE *file = fopen(path, "w");
     if (!file) return;
-    fprintf(file, "TOKEN=%s\nSERVER=%s\n", token ? token : "",
-            server ? server : "");
+    fprintf(file, "TOKEN=%s\n", token ? token : "");
     fclose(file);
 #ifndef _WIN32
     (void)chmod(path, 0600);

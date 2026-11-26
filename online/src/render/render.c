@@ -234,47 +234,47 @@ static void draw_online_setup(Art *art, const Game *game, int portrait,
     label(art, game->online_message, cx, portrait ? 190.0f : 112.0f,
           1.0f, GOLD, 1);
 
-    for (int i = 0; i < 2; ++i) {
-        Rect box;
-        layout_setup_field(portrait, i, &box);
-        int active = game->setup_cursor == i;
-        art->alpha = active ? 0.75f : 1.0f;
-        art->color = active ? GOLD : WHITE;
-        art_rect(art, box.x, box.y, box.w, box.h);
-        art->alpha = 1.0f;
-        art->color = BLACK;
-        art_rect(art, box.x + 2.0f, box.y + 2.0f, box.w - 4.0f, box.h - 4.0f);
+    Rect box;
+    layout_setup_field(portrait, &box);
+    int active = game->setup_cursor == 0;
+    art->alpha = active ? 0.75f : 1.0f;
+    art->color = active ? GOLD : WHITE;
+    art_rect(art, box.x, box.y, box.w, box.h);
+    art->alpha = 1.0f;
+    art->color = BLACK;
+    art_rect(art, box.x + 2.0f, box.y + 2.0f, box.w - 4.0f, box.h - 4.0f);
 
-        char entry[128];
-        if (i == 0) {
-            size_t n = strlen(game->token);
-            if (n > 16) n = 16;
-            memset(entry, '*', n);
-            entry[n] = '\0';
-            if (!n) snprintf(entry, sizeof(entry), "NONE");
-        } else {
-            snprintf(entry, sizeof(entry), "%s",
-                     game->server_entry[0] ? game->server_entry : "AUTO");
+    char entry[64];
+    size_t n = strlen(game->token);
+    if (n > 16) n = 16;
+    memset(entry, '*', n);
+    entry[n] = '\0';
+    if (!n) snprintf(entry, sizeof(entry), "NONE");
+    if (active && game->setup_typing && (now / 400) % 2) {
+        n = strlen(entry);
+        if (n + 1 < sizeof(entry)) {
+            entry[n] = '_';
+            entry[n + 1] = '\0';
         }
-        if (active && game->setup_typing && (now / 400) % 2) {
-            size_t n = strlen(entry);
-            if (n + 1 < sizeof(entry)) {
-                entry[n] = '_';
-                entry[n + 1] = '\0';
-            }
-        }
-        label(art, i == 0 ? "ACCESS TOKEN" : "SERVER",
-              box.x + 12.0f, box.y - 22.0f, 1.0f, FOOTER, 0);
-        label(art, entry, box.x + 12.0f, box.y + 24.0f,
-              1.5f, active ? GOLD : PALE_TEXT, 0);
     }
+    label(art, "ACCESS TOKEN", box.x + 12.0f, box.y - 22.0f,
+          1.0f, FOOTER, 0);
+    label(art, entry, box.x + 12.0f, box.y + 24.0f,
+          1.5f, active ? GOLD : PALE_TEXT, 0);
+
+    char server[152];
+    snprintf(server, sizeof(server), "SERVER: %s", game->server);
+    label(art, server, cx, portrait ? 350.0f : 250.0f,
+          1.0f, HINT, 1);
 
     for (int i = 0; i < 2; ++i) {
         Rect outer;
         Rect inner;
         layout_setup_button(portrait, i, &outer, &inner);
-        int active = game->setup_cursor == i + 2 || game->hover_item == i + 2;
-        art->color = active ? GOLD : WHITE;
+        int item = i + 1;
+        int button_active = game->setup_cursor == item ||
+                            game->hover_item == item;
+        art->color = button_active ? GOLD : WHITE;
         art_rect(art, outer.x, outer.y, outer.w, outer.h);
         art->color = i == 0 ? TEAL : MAROON;
         art_rect(art, inner.x, inner.y, inner.w, inner.h);
@@ -282,7 +282,7 @@ static void draw_online_setup(Art *art, const Game *game, int portrait,
               inner.y + 16.0f, 1.5f, WHITE, 1);
     }
 
-    label(art, "SELECT A FIELD, TYPE, THEN PRESS NEXT", cx,
+    label(art, "TYPE THE TOKEN, THEN PRESS NEXT", cx,
           portrait ? 680.0f : 498.0f, 1.0f, HINT, 1);
 }
 

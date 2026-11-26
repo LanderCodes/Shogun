@@ -30,7 +30,7 @@ int layout_winner_button_at(int portrait, float x, float y);
 void layout_mode_button(int portrait, int index, Rect *outer, Rect *inner);
 int layout_mode_button_at(int portrait, float x, float y);
 void layout_name_box(int portrait, Rect *out);
-void layout_setup_field(int portrait, int index, Rect *out);
+void layout_setup_field(int portrait, Rect *out);
 void layout_setup_button(int portrait, int index, Rect *outer, Rect *inner);
 int layout_setup_item_at(int portrait, float x, float y);
 

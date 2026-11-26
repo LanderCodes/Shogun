@@ -186,7 +186,6 @@ void game_init(Game *game, uint32_t seed, const Settings *settings)
     snprintf(game->name, sizeof(game->name), "PLAYER");
     game->name[sizeof(game->name) - 1] = '\0';
     snprintf(game->server, sizeof(game->server), "AUTO");
-    snprintf(game->server_entry, sizeof(game->server_entry), "AUTO");
     game->token[0] = '\0';
     game->setup_cursor = 0;
     game->setup_typing = 0;
@@ -243,7 +242,7 @@ void game_key(Game *game, int code)
                 game->setup_cursor = 0;
                 game->setup_typing = 0;
                 snprintf(game->online_message, sizeof(game->online_message),
-                         "ENTER YOUR SERVER DETAILS");
+                         "ENTER YOUR ACCESS TOKEN");
                 game->screen = SCREEN_ONLINE_SETUP;
             } else {
                 game->screen = SCREEN_MENU;
@@ -258,17 +257,13 @@ void game_key(Game *game, int code)
             break;
         }
         if (code == 1 || code == 3) {
-            game->setup_cursor = (game->setup_cursor + 3) % 4;
+            game->setup_cursor = (game->setup_cursor + 2) % 3;
         } else if (code == 2 || code == 4) {
-            game->setup_cursor = (game->setup_cursor + 1) % 4;
+            game->setup_cursor = (game->setup_cursor + 1) % 3;
         } else if (code == 5) {
-            if (game->setup_cursor <= 1) {
-                if (game->setup_cursor == 1 &&
-                    strcmp(game->server_entry, "AUTO") == 0) {
-                    game->server_entry[0] = '\0';
-                }
+            if (game->setup_cursor == 0) {
                 game->setup_typing = 1;
-            } else if (game->setup_cursor == 2) {
+            } else if (game->setup_cursor == 1) {
                 if (!game->token[0]) {
                     snprintf(game->online_message,
                              sizeof(game->online_message),
@@ -526,25 +521,21 @@ void game_name_backspace(Game *game)
 
 void game_setup_text(Game *game, const char *text)
 {
-    if (!text || !game->setup_typing || game->setup_cursor > 1) return;
-    char *field = game->setup_cursor == 0 ? game->token : game->server_entry;
-    size_t size = game->setup_cursor == 0 ? sizeof(game->token)
-                                          : sizeof(game->server_entry);
-    size_t used = strlen(field);
+    if (!text || !game->setup_typing || game->setup_cursor != 0) return;
+    size_t used = strlen(game->token);
     for (const unsigned char *p = (const unsigned char *)text; *p; ++p) {
-        if (used + 1 >= size) break;
+        if (used + 1 >= sizeof(game->token)) break;
         if (*p < 33 || *p > 126) continue;
-        field[used++] = (char)*p;
+        game->token[used++] = (char)*p;
     }
-    field[used] = '\0';
+    game->token[used] = '\0';
 }
 
 void game_setup_backspace(Game *game)
 {
-    if (!game->setup_typing || game->setup_cursor > 1) return;
-    char *field = game->setup_cursor == 0 ? game->token : game->server_entry;
-    size_t used = strlen(field);
-    if (used > 0) field[used - 1] = '\0';
+    if (!game->setup_typing || game->setup_cursor != 0) return;
+    size_t used = strlen(game->token);
+    if (used > 0) game->token[used - 1] = '\0';
 }
 
 void game_start_online(Game *game, uint32_t seed, Side side)

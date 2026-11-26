@@ -49,34 +49,32 @@ no wasm3, no WABT runtime, no sound and no scrolling ticker text**.
 
 ## Online play
 
-Select `TWO PLAYERS` and then `ONLINE GAME`. The setup menu asks for the access
-token and server address, then `NEXT` opens the name entry. Type a name (letters,
-numbers, spaces, `_` and `-`) and press Enter. The server address defaults to a
-lightly obfuscated address baked into `client.c`; type `AUTO` to use LAN
-discovery instead. Entered token and server values are stored in
-`~/.shogun_online.cfg` so they are prefilled next time; on Unix the file is
-created with mode `600`.
+Select `TWO PLAYERS` and then `ONLINE GAME`. The setup menu asks only for the
+access token and shows the compiled server address, then `NEXT` opens the name
+entry. Type a name (letters, numbers, spaces, `_` and `-`) and press Enter. The
+server address is a lightly obfuscated value in `client.c`, decoded at startup.
+Only the token is stored in `~/.shogun_online.cfg` so it is prefilled next time;
+on Unix the file is created with mode `600`.
 
 Both the server and every client must use the same private token. The token is
 never sent over the network; the server sends a random nonce and the client
-replies with a hash of nonce + token. The `SHOGUN_TOKEN` and `SHOGUN_SERVER`
-environment variables still work as initial defaults for the menu.
+replies with a hash of nonce + token. The `SHOGUN_TOKEN` environment variable
+still works as an initial default for the token field.
 
 Start a server on one machine before playing:
 
 ```bash
 ./online/build/shogun-server            # default port 7777
-./online/build/shogun-server 9000       # custom port; type host:9000 in the menu
+./online/build/shogun-server 9000       # custom port; rebuild clients with that address
 ```
 
 For a systemd service, put the token in a root-only environment file such as
 `/etc/shogun-server.env` (`chmod 600`) and add
 `EnvironmentFile=/etc/shogun-server.env` to the service unit.
 
-The server also answers UDP discovery on the same port, so clients on the same
-LAN can use `AUTO`. While online, Escape pauses; `MAIN MENU` forfeits the match.
-After a finished game, `PLAY AGAIN` asks the opponent for a rematch; the server
-deals a new seed once both players agree.
+While online, Escape pauses; `MAIN MENU` forfeits the match. After a finished
+game, `PLAY AGAIN` asks the opponent for a rematch; the server deals a new seed
+once both players agree.
 
 ## Presentation
 

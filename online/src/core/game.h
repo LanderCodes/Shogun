@@ -36,7 +36,6 @@ typedef struct {
     char name[ONLINE_NAME_SIZE];
     char opponent[ONLINE_OPPONENT_SIZE];
     char server[128];
-    char server_entry[128];
     char token[ONLINE_TOKEN_SIZE];
     int setup_cursor;
     int setup_typing;

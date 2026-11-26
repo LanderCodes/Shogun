@@ -34,8 +34,8 @@ int main(int argc, char **argv)
     uint32_t seed = SDL_GetTicks() ^ (uint32_t)(uintptr_t)&app;
     Game game;
     game_init(&game, seed, &settings);
-    online_prefs_load(game.token, sizeof(game.token), game.server_entry,
-                      sizeof(game.server_entry));
+    online_prefs_load(game.token, sizeof(game.token));
+    snprintf(game.server, sizeof(game.server), "%s", online_default_server());
 
     OnlineNet net;
     online_net_init(&net);
@@ -75,15 +75,15 @@ int main(int argc, char **argv)
         if (game.pending_connect) {
             game.pending_connect = 0;
             online_net_close(&net);
-            if (!online_net_connect_string(&net, game.server_entry, game.name,
-                                           game.token)) {
+            if (!online_net_connect_string(&net, online_default_server(),
+                                           game.name, game.token)) {
                 snprintf(game.online_message, sizeof(game.online_message),
                          game.token[0] ? "COULD NOT CONNECT TO SERVER"
                                        : "ACCESS TOKEN IS NOT SET");
                 game.online_phase = ONLINE_NONE;
             } else {
                 snprintf(game.server, sizeof(game.server), "%s", net.server);
-                online_prefs_save(game.token, game.server_entry);
+                online_prefs_save(game.token);
             }
         }
 

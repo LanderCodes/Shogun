@@ -106,51 +106,43 @@ so the tests work without a display.
 
 ### Windows
 
-Use MSYS2 with the UCRT64 toolchain. Install MSYS2 from https://www.msys2.org/,
-open the **MSYS2 UCRT64** terminal, and run:
+You do not need `pacman`, Git, CMake or a compiler just to play. Use a prepared
+Windows folder containing:
 
-```bash
-pacman -Syu
+```text
+shogun.exe
+SDL2.dll
 ```
 
-Close and reopen the UCRT64 terminal if `pacman` asks you to, then install the
-build tools:
+For online play with a hosted server, the host also needs:
 
-```bash
-pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake \
-  mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-SDL2 git
+```text
+shogun-server.exe
+SDL2.dll
 ```
 
-From the repository directory in that same UCRT64 terminal:
+Keep the `.exe` and `SDL2.dll` in the same folder. Double-click `shogun.exe` to
+play. If Windows says `SDL2.dll` is missing, put `SDL2.dll` next to `shogun.exe`.
 
-```bash
-cmake -S . -B build -G "MinGW Makefiles"
-cmake --build build -j2
-ctest --test-dir build --output-on-failure
+To host from Command Prompt in that folder:
 
-cmake -S online -B online/build -G "MinGW Makefiles"
-cmake --build online/build -j2
-ctest --test-dir online/build --output-on-failure
+```bat
+set SHOGUN_TOKEN=your-private-token
+shogun-server.exe
 ```
 
-Run from that terminal:
-
-```bash
-./build/shogun.exe
-./online/build/shogun.exe
-```
-
-If you want to launch `shogun.exe` from File Explorer instead, copy
-`C:\msys64\ucrt64\bin\SDL2.dll` next to the `.exe`, or add
-`C:\msys64\ucrt64\bin` to your Windows `PATH`.
+Leave that window open while people are playing. Building from source on Windows
+needs a C99/SDL2 toolchain; the instructions above are for installing and
+playing the prepared Windows build.
 
 ### Online setup
 
-The `online/` build adds `TWO PLAYERS` -> `ONLINE GAME`. The setup menu asks for
-the access token and server address. The server binary is
-`online/build/shogun-server` on Linux and `online\build\shogun-server.exe` on
-Windows. See `online/README.md` for server, token, VPN/port-forward and
-troubleshooting instructions, and `online/notes.md` for implementation notes.
+The `online/` build adds `TWO PLAYERS` -> `ONLINE GAME`. The setup menu asks only
+for the access token; the server address is compiled into the client and shown
+on the setup screen. The server binary is `online/build/shogun-server` on Linux
+and `shogun-server.exe` in the Windows folder. See `online/README.md` for
+server, token, VPN/port-forward and troubleshooting instructions, and
+`online/notes.md` for implementation notes.
 
 ## Differences from the builds in `alt/`
 

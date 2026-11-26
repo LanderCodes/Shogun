@@ -51,14 +51,6 @@ static void check_online_setup(void)
     game_key(&game, 2);
     assert(game.setup_cursor == 1);
     game_key(&game, 5);
-    assert(game.setup_typing);
-    game_setup_text(&game, "server.example:7777");
-    assert(strcmp(game.server_entry, "server.example:7777") == 0);
-    game_key(&game, 6);
-    assert(!game.setup_typing);
-    game_key(&game, 2);
-    assert(game.setup_cursor == 2);
-    game_key(&game, 5);
     assert(game.screen == SCREEN_ONLINE_NAME);
 }
 
