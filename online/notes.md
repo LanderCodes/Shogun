@@ -30,6 +30,17 @@ no wasm3, no WABT runtime, no sound and no scrolling ticker text**.
     └── smoke_test.c        dummy-SDL rendering and rematch checks
 ```
 
+## Windows one-command build
+
+Run this in PowerShell on Windows. It installs Git if needed, clones only the
+`online/` directory, installs Visual Studio Build Tools and SDL2 through vcpkg,
+builds the client and server, runs the tests, and writes the `.exe` files to
+`Shogun\online\windows-release-native`:
+
+```powershell
+winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements; $env:Path += ";C:\Program Files\Git\cmd;C:\Program Files (x86)\Git\cmd"; git clone --filter=blob:none --sparse https://github.com/LanderCodes/Shogun.git Shogun; cd Shogun; git sparse-checkout set online; powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows-native.ps1
+```
+
 ## Rules implemented
 
 - An 8x8 board with hidden terrain numbers from 1 to 4.

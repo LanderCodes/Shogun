@@ -52,23 +52,31 @@ If you are hosting the server on Windows, also include `shogun-server.exe` and
 
 ## Windows build
 
-From PowerShell in the repository root:
+For a Windows-native build without MSYS2 or `pacman`, run this from PowerShell in
+the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows-native.ps1
+```
+
+It uses `winget`, Visual Studio Build Tools and vcpkg. It runs the tests unless
+`-SkipTests` is passed, then copies `shogun.exe`, `shogun-server.exe` and
+`SDL2.dll` to `online\windows-release-native`.
+
+The older MinGW-w64 script is still available:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows.ps1
 ```
 
-Or double-click `online\build-windows.bat`.
-
-The script expects MinGW-w64, CMake, pkg-config and SDL2 development files in
+It expects MinGW-w64, CMake, pkg-config and SDL2 development files in
 `C:\msys64\ucrt64\bin`. For another MinGW-w64 installation:
 
 ```powershell
 .\online\build-windows.ps1 -MingwBin "C:\path\to\mingw\bin"
 ```
 
-It runs the tests unless `-SkipTests` is passed, then copies `shogun.exe`,
-`shogun-server.exe` and `SDL2.dll` to `online\windows-release`.
+That script writes to `online\windows-release`.
 
 ## Run the server
 

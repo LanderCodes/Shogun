@@ -133,17 +133,18 @@ shogun-server.exe
 
 Leave that window open while people are playing.
 
-To build the Windows `.exe` files from source, use the build script from
-PowerShell in the repository root:
+To build the Windows `.exe` files from source without MSYS2 or `pacman`, use the
+native build script from PowerShell in the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\online\build-windows-native.ps1
 ```
 
-It expects a working MinGW-w64 toolchain with CMake, pkg-config and SDL2
-development files in `C:\msys64\ucrt64\bin`, or pass `-MingwBin` with another
-MinGW-w64 `bin` directory. It writes `shogun.exe`, `shogun-server.exe` and
-`SDL2.dll` to `online\windows-release`.
+It uses `winget`, Visual Studio Build Tools and vcpkg, then writes `shogun.exe`,
+`shogun-server.exe` and `SDL2.dll` to `online\windows-release-native`.
+
+The older `online\build-windows.ps1` script builds with an existing MinGW-w64
+toolchain in `C:\msys64\ucrt64\bin` and writes to `online\windows-release`.
 
 ### Online setup
 

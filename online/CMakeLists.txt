@@ -8,8 +8,20 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+find_package(SDL2 CONFIG QUIET)
+if(SDL2_FOUND AND TARGET SDL2::SDL2)
+    set(SHOGUN_SDL2 SDL2::SDL2)
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+    set(SHOGUN_SDL2 PkgConfig::SDL2)
+endif()
+
+if(MSVC)
+    set(SHOGUN_MATH_LIB)
+else()
+    set(SHOGUN_MATH_LIB m)
+endif()
 
 set(CORE_SOURCES
     src/core/ai.c
@@ -48,7 +60,7 @@ add_executable(shogun src/ui/main.c ${CORE_SOURCES} ${RENDER_SOURCES}
 target_include_directories(shogun PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(shogun PRIVATE PkgConfig::SDL2 m)
+target_link_libraries(shogun PRIVATE ${SHOGUN_SDL2} ${SHOGUN_MATH_LIB})
 if(WIN32)
     target_link_libraries(shogun PRIVATE ws2_32)
 endif()
@@ -89,7 +101,7 @@ add_executable(smoke_test
 target_include_directories(smoke_test PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(smoke_test PRIVATE PkgConfig::SDL2 m)
+target_link_libraries(smoke_test PRIVATE ${SHOGUN_SDL2} ${SHOGUN_MATH_LIB})
 target_compile_options(smoke_test PRIVATE -Wall -Wextra)
 add_test(NAME smoke COMMAND smoke_test)
 set_tests_properties(smoke PROPERTIES
